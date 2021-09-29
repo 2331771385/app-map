@@ -1,0 +1,35 @@
+#app {
+    height: 100vh;
+    width: 100%;
+    background-color: aqua;
+}
+.title-container {
+    height: 7.5rem;
+    width: 100%;
+    background-color: #9b0d14;
+}
+.title {
+    width: 100%;
+    height: 3.5rem;
+}
+.titleIcon {
+    float: left;
+    width: 10%;
+    line-height: 3.5rem;
+    text-align: center;
+}
+.titleContent {
+    float: left;
+    width: 80%;
+    text-align: center;
+    line-height: 3.5rem;
+    color: #fff;
+    font-size: 1.8rem;
+}
+.titleSelect {
+    display: flex;
+    justify-content: space-between;
+    height: 4rem;
+    width: 100%;
+    background-color: blanchedalmond;
+}
