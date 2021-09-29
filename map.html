@@ -6,17 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>外部地图的引用</title>
     <link rel="stylesheet" href="./map.css" />
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-    <script src="./map.js"></script>
-    <!-- 引入高德地图 -->
-    <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&&plugin=AMap.ControlBar,AMap.ToolBar"></script>
-    <script src="https://webapi.amap.com/ui/1.1/main.js"></script>
-    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
     <!-- 先引入 Vue -->
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <!-- 引入 http-vue-loader -->
     <script src="https://unpkg.com/http-vue-loader"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <!-- 引入高德地图 -->
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&&plugin=AMap.ControlBar,AMap.ToolBar"></script>
+    <script src="https://webapi.amap.com/ui/1.1/main.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
 </head>
 <body>
     <div id="app">
@@ -28,7 +27,44 @@
                 <div class="titleContent">{{campusName}}</div>
             </div>
             <div class="titleSelect">
-                
+                <div class="tabItem">迎新</div>
+                <div class="tabItem">热门景点</div>
+                <div class="tabItem1">
+                    <el-select v-model="buildVal">
+                        <el-option
+                            v-for="item in toolBarList"
+                            :key="item.id"
+                            :label="item.text"
+                            :value="item.text"
+                        >
+
+                        </el-option>
+                    </el-select>
+                </div>
+                <div class="tabItem1">
+                    <el-select v-model="colleageVal">
+                        <el-option
+                            v-for="item in colleageList"
+                            :key="item.id"
+                            :label="item.text"
+                            :value="item.text"
+                        >
+
+                        </el-option>
+                    </el-select>
+                </div>
+                <div class="tabItem1">
+                    <el-select v-model="publicVal">
+                        <el-option
+                            v-for="item in publicList"
+                            :key="item.id"
+                            :label="item.text"
+                            :value="item.text"
+                        >
+
+                        </el-option>
+                    </el-select>
+                </div>
             </div>
         </div>
         <div class="mapContaimer"></div>
@@ -244,6 +280,9 @@
                         }
                     ],
                     backImg: './img/back1.png', 
+                    buildVal: '',
+                    publicVal: '',
+                    colleageVal: ''
                 }
             },
             created() {
