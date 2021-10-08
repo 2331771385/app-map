@@ -13,7 +13,10 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <!-- 引入高德地图 -->
-    <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&&plugin=AMap.ControlBar,AMap.ToolBar"></script>
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&plugin=Map3D,AMap.DistrictLayer,AMap.Scale,AMap.ToolBar,AMap.Transfer,AMap.Geolocation,AMap.plugin,AMap.Pixel"></script>
+
+
+    <!-- <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&&plugin=AMap.ControlBar,AMap.ToolBar"></script> -->
     <script src="https://webapi.amap.com/ui/1.1/main.js"></script>
     <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
 </head>
@@ -67,7 +70,7 @@
                 </div>
             </div>
         </div>
-        <div class="mapContaimer"></div>
+        <div id="mapContaimer"></div>
     </div>
 
    <script>
@@ -282,12 +285,43 @@
                     backImg: './img/back1.png', 
                     buildVal: '',
                     publicVal: '',
-                    colleageVal: ''
+                    colleageVal: '',
+                    campusPicture: ''
                 }
             },
             created() {
                 this.transformRem();
                 this.getSearchVal();
+                // this.getCampusMap();
+            },
+            mounted() {
+                this.imageLayer = new AMap.ImageLayer({
+                    url: this.campusPicture,
+                    bounds: new AMap.Bounds(
+                        [117.064665,36.684174],
+                        [117.073055,36.690816]    
+                    ),
+                    // zIndex: 5,
+                    zooms: [13, 19]
+                });
+                this.map = new AMap.Map("mapContaimer", {
+                    //地图显示的缩放级别，若center与level未赋值，地图初始化默认显示用户所在城市范围
+                    //3D地图下，zoom值，可以设置为浮点数。（在V1.3.0版本level参数调整为zoom，3D地图修改自V1.4.0开始生效）
+                    //山东省经度：东经114度19分-122度43分
+                    //山东省纬度：北纬34度22分-38度23分
+                    //据此算出中心经纬度：
+                    resizeEnable: true,
+                    expendZoomRange: true,
+                    center: [this.longitude,this.latitude],
+                    zoom: 16,
+                    pitch: 0,
+                    viewMode: "3D",
+                    mapStyle: 'amap://styles/26928e0d237c05ee59578815438bc75e', //设置地图的显示样式
+                    layers: [
+                        new AMap.TileLayer(),
+                        this.imageLayer
+                    ]
+                });
             },
             methods: {
                 transformRem() {
@@ -317,9 +351,11 @@
                         if(item.id == this.campusId) {
                             this.longitude = item.longitude;
                             this.latitude = item.latitude;
+                            this.campusPicture = item.markerImg;
                         }
                     });
-                }
+                },
+
             },
         })
    </script> 
