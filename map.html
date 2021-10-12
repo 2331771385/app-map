@@ -295,11 +295,13 @@
                 // this.getCampusMap();
             },
             mounted() {
+                console.log('这里显示的是图层');
+                console.log(this.campusPicture);
                 this.imageLayer = new AMap.ImageLayer({
                     url: this.campusPicture,
                     bounds: new AMap.Bounds(
-                        [117.064665,36.684174],
-                        [117.073055,36.690816]    
+                        [117.055539,36.671882],
+                        [117.064508,36.68114]    
                     ),
                     // zIndex: 5,
                     zooms: [13, 19]
