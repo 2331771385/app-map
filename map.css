@@ -1,3 +1,7 @@
+*{
+    padding: 0;
+    margin: 0;
+}
 #app {
     height: 100vh;
     width: 100%;
@@ -31,10 +35,11 @@
     width: 100%;
     color: #fff;
 }
-.tabItem {
-    width: 50%;
-    text-align: center;
+.tabClass {
+    width: 80%;
     line-height: 4rem;
+    text-align: center;
+    /* background-color: #fff; */
 }
 .tabItem1 {
     width: 70%;
@@ -52,17 +57,22 @@
 .el-select-dropdown__item .selected {
     color: #fff !important;
 }
+.el-select-dropdown__item.selected {
+    background-color: #9b0d14 !important;
+}
 .el-input__inner {
     height: 3rem !important;
     line-height: 4rem !important;
     padding: 0 0.5rem !important;
     background-color: #9b0d14 !important; 
     border: none !important;
+    color: #fff !important;
 }
 .el-input::placeholder {
     color: #fff !important;
 }
 .el-input__suffix {
+    right: 2px !important;
     /* padding-top: 1rem; */
     height: 3rem !important;
     /* line-height: 4rem !important; */
@@ -89,10 +99,63 @@
     top: 90px;
 }
 .el-input__icon {
-    /* height: 100%; */
-    width: 25px;
-    text-align: center;
-    -webkit-transition: all .3s;
-    transition: all .3s;
+    width: 15px !important;
     line-height: 3rem !important;
+}
+.el-tabs__active-bar {
+    bottom: 1rem !important;
+}
+.el-tabs__nav-wrap::after {
+    content: none !important;
+}
+.el-tabs__item.is-active {
+    color: #fff !important;
+}
+.el-tabs__active-bar {
+    background-color: #fff !important;
+}
+.el-tabs__item {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    color: #fff !important;
+}
+.searchBox {
+    display: flex;
+    position: absolute;
+    top: 9rem;
+    left: 25%;
+    width: 50%;
+    height: 3rem;
+}
+.inputBox .el-input {
+    background-color: #fff !important;
+}
+.inputBox {
+    display: block;
+    float: left;
+    margin-top: 2px;
+    height: 2.5rem;
+    width: 80%;
+    background-color: #fff;
+}
+input {
+    height: 2.5rem;
+    border: 1px solid #9b0d14;
+}
+input::placeholder {
+    padding-left: 5px;
+}
+input:focus {
+    border: 1px solid #9b0d14;
+    border-radius: 0 !important;
+}
+.searchBtn {
+    margin-top: 2px;
+    border: none;
+    display: block;
+    float: left;
+    height: 2.7rem;
+    color: #fff;
+    background-color: #9b0d14;
+    width: 20%;
 }

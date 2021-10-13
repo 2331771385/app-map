@@ -14,7 +14,7 @@
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <!-- 引入高德地图 -->
     <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&plugin=Map3D,AMap.DistrictLayer,AMap.Scale,AMap.ToolBar,AMap.Transfer,AMap.Geolocation,AMap.plugin,AMap.Pixel"></script>
-
+    <script src="http://cdn.suoluomei.com/common/js2.0/axios/axios.min.js"></script>
 
     <!-- <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&&plugin=AMap.ControlBar,AMap.ToolBar"></script> -->
     <script src="https://webapi.amap.com/ui/1.1/main.js"></script>
@@ -30,15 +30,19 @@
                 <div class="titleContent">{{campusName}}</div>
             </div>
             <div class="titleSelect">
-                <div class="tabItem">迎新</div>
-                <div class="tabItem">热门景点</div>
+                <div class="tabClass">
+                    <el-tabs v-model="activeName">
+                        <el-tab-pane label="迎新" name="first"></el-tab-pane>
+                        <el-tab-pane label="热门景点" name="second"></el-tab-pane>
+                    </el-tabs>
+                </div>
                 <div class="tabItem1">
                     <el-select v-model="buildVal">
                         <el-option
                             v-for="item in toolBarList"
                             :key="item.id"
                             :label="item.text"
-                            :value="item.text"
+                            :value="item.id"
                         >
 
                         </el-option>
@@ -50,7 +54,7 @@
                             v-for="item in colleageList"
                             :key="item.id"
                             :label="item.text"
-                            :value="item.text"
+                            :value="item.id"
                         >
 
                         </el-option>
@@ -62,7 +66,7 @@
                             v-for="item in publicList"
                             :key="item.id"
                             :label="item.text"
-                            :value="item.text"
+                            :value="item.id"
                         >
 
                         </el-option>
@@ -70,7 +74,14 @@
                 </div>
             </div>
         </div>
+        <!-- 地图以及手绘地图的贴图 -->
         <div id="mapContaimer"></div>
+
+        <!-- 搜索框 -->
+        <div class="searchBox">
+            <input class="inputBox" v-model="searchVal" placeholder='请输入查询关键词' />
+            <button class="searchBtn" @click="getResultList">查询</button>
+        </div>
     </div>
 
    <script>
@@ -283,20 +294,47 @@
                         }
                     ],
                     backImg: './img/back1.png', 
-                    buildVal: '',
-                    publicVal: '',
-                    colleageVal: '',
-                    campusPicture: ''
+                    buildVal: 0,
+                    publicVal: 0,
+                    colleageVal: 0,
+                    campusPicture: '',
+                    isShowDivide: true, // 控制选中的时候下划线的显示与隐藏
+                    activeName: 'first',
+                    searchVal: '', // 模糊搜索
+                    token: '', // 访问页面调用的token
                 }
             },
             created() {
+                // 获得token
+                this.getToken();
                 this.transformRem();
                 this.getSearchVal();
-                // this.getCampusMap();
+                
+            },
+            watch: {
+                'buildVal':function(newVal, oldVal) {
+                    if(newVal !== 0){
+                        this.activeName = '';
+                        this.publicVal = 0;
+                        this.colleageVal = 0;
+                    }
+                },
+                'publicVal':function(newVal, oldVal){
+                    if (newVal !== 0) {
+                        this.activeName = '';
+                        this.buildVal = 0;
+                        this.colleageVal = 0;
+                    }
+                },
+                'colleageVal':function(newVal, oldVal){
+                    if (newVal !== 0) {
+                        this.activeName = '';
+                        this.publicVal = 0;
+                        this.buildVal = 0;
+                    }
+                }
             },
             mounted() {
-                console.log('这里显示的是图层');
-                console.log(this.campusPicture);
                 this.imageLayer = new AMap.ImageLayer({
                     url: this.campusPicture,
                     bounds: new AMap.Bounds(
@@ -326,6 +364,22 @@
                 });
             },
             methods: {
+                //获得页面中的token
+                getToken(){
+                    $.ajax({
+                        url: '/campus/m_generateToken',
+                        type: 'post',
+                        dataType: 'json',
+                        success:function(data){
+                            console.log('====');
+                            console.log(data);
+                            this.token = data.msg;
+                        },
+                        error:function(err){
+                            console.log(err);
+                        }
+                    })
+                },
                 transformRem() {
                     var winW = document.documentElement.clientWidth || document.body.clientWidth;
                     document.documentElement.style.fontSize =  (winW *20)/750 + "px"; // 1rem = 10px
@@ -356,6 +410,33 @@
                             this.campusPicture = item.markerImg;
                         }
                     });
+                },
+                checkLine() {
+                    this.isShowDivide = !this.isShowDivide;
+                },
+                /*
+                得到的查询结果
+                */
+                getResultList() {
+                    console.log(this.token);
+                    $.ajax({
+                        url: '/poi/getCampusPoiList',
+                        type: 'get',
+                        dataType: 'json',
+                        data: {
+                            token: this.token,
+                            ID: this.campusId,
+                            keyWord: this.searchVal
+                        },
+                        success:function(res) {
+                            console.log('请求成功');
+                            console.log(res);
+                        },
+                        error:function(err) {
+                            console.log('请求失败');
+                        }
+                    })
+                    
                 },
 
             },
