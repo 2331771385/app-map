@@ -92,7 +92,7 @@
 }
 
 #mapContaimer {
-    height: 85%;
+    height: 100%;
     width: 100%;
     position: absolute;
     left: 0;
@@ -158,4 +158,26 @@ input:focus {
     color: #fff;
     background-color: #9b0d14;
     width: 20%;
+}
+#Dialog {
+    height: 8rem;
+    width: 95%;
+    background-color: aqua;
+    position: absolute;
+    bottom: 0;
+    padding: 0.2rem;
+    left: 2%;
+    border-radius: 0.5rem;
+}
+.contentTitle {
+    height: 1rem;
+    background-color: blanchedalmond;
+}
+.contentDes {
+    height: 3rem;
+    background-color: blueviolet;
+}
+.contentOpt {
+    height: 1rem;
+    background-color: cadetblue;
 }

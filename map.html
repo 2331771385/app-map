@@ -82,6 +82,13 @@
             <input class="inputBox" v-model="searchVal" placeholder='请输入查询关键词' />
             <button class="searchBtn" @click="getResultList">查询</button>
         </div>
+
+        <!-- 页面底部的位置弹框 -->
+        <div id="Dialog">
+            <div class="contentTitle"></div>
+            <div class="contentDes"></div>
+            <div class="contentOpt"></div>
+        </div>
     </div>
 
    <script>
@@ -302,6 +309,8 @@
                     activeName: 'first',
                     searchVal: '', // 模糊搜索
                     token: '', // 访问页面调用的token
+                    dataList: [], //调用接口返回的数据
+                    markersList: [], //点标记的数组，可能一次会加入很多点
                 }
             },
             created() {
@@ -371,9 +380,7 @@
                         type: 'post',
                         dataType: 'json',
                         success:function(data){
-                            console.log('====');
-                            console.log(data);
-                            this.token = data.msg;
+                            localStorage.setItem('token', data.msg);
                         },
                         error:function(err){
                             console.log(err);
@@ -418,25 +425,65 @@
                 得到的查询结果
                 */
                 getResultList() {
-                    console.log(this.token);
+                    let _this = this;
+                    let token = localStorage.getItem('token');
                     $.ajax({
                         url: '/poi/getCampusPoiList',
                         type: 'get',
                         dataType: 'json',
                         data: {
-                            token: this.token,
+                            token: token,
                             ID: this.campusId,
                             keyWord: this.searchVal
                         },
                         success:function(res) {
-                            console.log('请求成功');
-                            console.log(res);
+                            if (res.recs.length) {
+                                _this.dataList = res.recs;
+                                for(let i = 0;i<_this.dataList.length;i++){
+                                    let longitude = _this.dataList[i].longitude;
+                                    let latitude = _this.dataList[i].latitude;
+                                    
+                                    //文本标记
+                                    var text = new AMap.Text({
+                                        id: _this.dataList[i].PoiID,
+                                        text: _this.dataList[i].PoiName,
+                                        cursor: 'pointer',
+                                        // map: this.map,
+                                        position: [longitude, latitude],
+                                        anchor: 'center',
+                                        style: {
+                                            'padding': '0.05rem 0.1rem',
+                                            'margin-bottom': '0rem',
+                                            'border-radius': '0.5rem',
+                                            'background-color': 'rgba(255,255,255,0.8)',
+                                            'border-width': 1,
+                                            'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                            'text-align': 'center',
+                                            'font-size': '12px',
+                                            'color': 'rgba(155,13,20,1)'
+                                        },
+                                    })
+                                    text.setMap(_this.map);
+                                    text.on('click', _this.markerClick);
+                                    _this.markersList.push(text);
+                                }
+                            }
                         },
                         error:function(err) {
                             console.log('请求失败');
                         }
                     })
-                    
+                },
+
+                // 点击地图上的某一点，就出现类似于弹框的样式
+                markerClick(e) {
+                    this.setPoiSelected(e.target.w.id,true);
+                },   
+                //点击某一点的位置，出现响应的弹框
+                setPoiSelected(poiID,isMoveListItem){
+                    console.log(poiID);
+                    console.log(isMoveListItem);
+
                 },
 
             },
