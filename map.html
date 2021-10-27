@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>外部地图的引用</title>
-    <link rel="stylesheet" href="./map.css" />
+    <link rel="stylesheet" href="http://localhost:8081/map.css" />
+
+    <!-- <link rel="stylesheet" href="./map.css" /> -->
     <!-- 先引入 Vue -->
     <script src="https://unpkg.com/vue/dist/vue.js"></script>
     <!-- 引入 http-vue-loader -->
@@ -32,8 +34,8 @@
             <div class="titleSelect">
                 <div class="tabClass">
                     <el-tabs v-model="activeName">
-                        <el-tab-pane label="迎新" name="first"></el-tab-pane>
-                        <el-tab-pane label="热门景点" name="second"></el-tab-pane>
+                        <el-tab-pane label="迎新" name="4"></el-tab-pane>
+                        <el-tab-pane label="热门景点" name="3"></el-tab-pane>
                     </el-tabs>
                 </div>
                 <div class="tabItem1">
@@ -84,11 +86,46 @@
         </div>
 
         <!-- 页面底部的位置弹框 -->
-        <div id="Dialog">
-            <div class="contentTitle"></div>
-            <div class="contentDes"></div>
-            <div class="contentOpt"></div>
+        <div id="Dialog" v-if="isShowDialog">
+            <div class="contentTitle">
+                <div class="localtionTitle">{{localtionTitle}}</div>
+                <!-- <div class="localtionDis">距你{{localtionDis}}</div> -->
+            </div>
+            <div class="contentDes" @click="goToWxDetail">
+                <div class="localtionContent">
+                    <span class="localtionContentText">{{localtionDes}}</span>
+                </div>
+            </div>
+            <div class="contentOpt" >
+                <div class="optList">
+                    <div class="optDetail">
+                        <span class="optDetailSpan">
+                            <img class="detailImg" src="./img/3d-detail.png">
+                        </span>
+                        <span @click='goToWxDetail'>详情</span>
+                    </div>
+                    <div class="optAllPic">
+                        <span class="optDetailSpan">
+                            <img class="detailImg" src="./img/shijing.png">
+                        </span>
+                        <span @click='goToWxAllPic'>全景</span>
+                    </div>
+                    <div class="optPath">
+                        <span class="optDetailSpan">
+                            <img class="detailImg" src="./img/go.png">
+                        </span>
+                        <span @click='goToWxPath'>前往</span>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <el-dialog
+            :visible.sync="errorDialog"
+            width="80%"
+            title="aaaaa"
+        >
+        </el-dialog>
     </div>
 
    <script>
@@ -99,6 +136,11 @@
             el: '#app',
             data: function () {
                 return { 
+                    errorDialog: true,
+                    isShowDialog: false,
+                    localtionTitle: '', //当前点击点的位置信息
+                    localtionDis: '', //当前位置距位置点的距离
+                    localtionDes: '',//当前位置点的简介
                     campusName: '',
                     campusId: 0,
                     longitude: 0,
@@ -306,7 +348,7 @@
                     colleageVal: 0,
                     campusPicture: '',
                     isShowDivide: true, // 控制选中的时候下划线的显示与隐藏
-                    activeName: 'first',
+                    activeName: '4',
                     searchVal: '', // 模糊搜索
                     token: '', // 访问页面调用的token
                     dataList: [], //调用接口返回的数据
@@ -318,28 +360,41 @@
                 this.getToken();
                 this.transformRem();
                 this.getSearchVal();
-                
+                // 打开页面的时候，调用接口
+                this.getResultData(this.activeName);
             },
             watch: {
                 'buildVal':function(newVal, oldVal) {
                     if(newVal !== 0){
+                        this.isShowDialog = false;
                         this.activeName = '';
                         this.publicVal = 0;
                         this.colleageVal = 0;
+                        this.getResultBuildList(newVal);
                     }
                 },
                 'publicVal':function(newVal, oldVal){
                     if (newVal !== 0) {
+                        this.isShowDialog = false;
                         this.activeName = '';
                         this.buildVal = 0;
                         this.colleageVal = 0;
+                        this.getResultBuildList(newVal);
                     }
                 },
                 'colleageVal':function(newVal, oldVal){
                     if (newVal !== 0) {
+                        this.isShowDialog = false;
                         this.activeName = '';
                         this.publicVal = 0;
                         this.buildVal = 0;
+                        this.getResultBuildList(newVal);
+                    }
+                },
+                'activeName':function(newVal, oldVal) {
+                    if (newVal !== oldVal && (newVal == '3' || newVal == '4')) {
+                        this.isShowDialog = false;
+                        this.getResultData(newVal);
                     }
                 }
             },
@@ -354,11 +409,6 @@
                     zooms: [13, 19]
                 });
                 this.map = new AMap.Map("mapContaimer", {
-                    //地图显示的缩放级别，若center与level未赋值，地图初始化默认显示用户所在城市范围
-                    //3D地图下，zoom值，可以设置为浮点数。（在V1.3.0版本level参数调整为zoom，3D地图修改自V1.4.0开始生效）
-                    //山东省经度：东经114度19分-122度43分
-                    //山东省纬度：北纬34度22分-38度23分
-                    //据此算出中心经纬度：
                     resizeEnable: true,
                     expendZoomRange: true,
                     center: [this.longitude,this.latitude],
@@ -371,6 +421,7 @@
                         this.imageLayer
                     ]
                 });
+                this.map.on('click', this.showInfoClick)
             },
             methods: {
                 //获得页面中的token
@@ -475,17 +526,200 @@
                     })
                 },
 
-                // 点击地图上的某一点，就出现类似于弹框的样式
-                markerClick(e) {
-                    this.setPoiSelected(e.target.w.id,true);
-                },   
-                //点击某一点的位置，出现响应的弹框
-                setPoiSelected(poiID,isMoveListItem){
-                    console.log(poiID);
-                    console.log(isMoveListItem);
 
+                getResultData(poiType) {
+                    if (this.markersList.length) {
+                        this.map.remove(this.markersList);
+                    }
+                    let _this = this;
+                    let token = localStorage.getItem('token');
+                    $.ajax({
+                        url: '/poi/getCampusPoiList',
+                        type: 'get',
+                        dataType: 'json',
+                        data: {
+                            token: token,
+                            ID: this.campusId,
+                            poiType: poiType
+                        },
+                        success:function(res) {
+                            if (res.recs.length) {
+                                _this.dataList = res.recs;
+                                for(let i = 0;i<_this.dataList.length;i++){
+                                    let longitude = _this.dataList[i].longitude;
+                                    let latitude = _this.dataList[i].latitude;
+                                    if (longitude == null || latitude == null) {
+                                        continue;
+                                    }
+                                    //文本标记
+                                    var text = new AMap.Text({
+                                        id: _this.dataList[i].PoiID,
+                                        text: _this.dataList[i].PoiName,
+                                        cursor: 'pointer',
+                                        // map: this.map,
+                                        position: [longitude, latitude],
+                                        anchor: 'center',
+                                        style: {
+                                            'padding': '0.05rem 0.1rem',
+                                            'margin-bottom': '0rem',
+                                            'border-radius': '0.5rem',
+                                            'background-color': 'rgba(255,255,255,0.8)',
+                                            'border-width': 1,
+                                            'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                            'text-align': 'center',
+                                            'font-size': '12px',
+                                            'color': 'rgba(155,13,20,1)'
+                                        },
+                                    })
+                                    text.setMap(_this.map);
+                                    text.on('click', _this.markerClick);
+                                    _this.markersList.push(text);
+                                }
+                            }
+                        },
+                        error:function(err) {
+                            console.log('请求失败');
+                        }
+                    })
                 },
 
+                // 得到建筑数据
+                getResultBuildList(poiType){
+                    if (poiType == '1' || poiType == '2' || poiType == '5') {
+                        this.getResultData(poiType);
+                        return;
+                    }
+                    if (this.markersList.length) {
+                        this.map.remove(this.markersList);
+                    }
+                    let _this = this;
+                    let token = localStorage.getItem('token');
+                    $.ajax({
+                        url: '/poi/getCampusPoiList',
+                        type: 'get',
+                        dataType: 'json',
+                        data: {
+                            token: token,
+                            ID: this.campusId,
+                            poiSubType: poiType
+                        },
+                        success:function(res) {
+                            if (res.recs.length) {
+                                _this.dataList = res.recs;
+                                for(let i = 0;i<_this.dataList.length;i++){
+                                    let longitude = _this.dataList[i].longitude;
+                                    let latitude = _this.dataList[i].latitude;
+                                    if (longitude == null || latitude == null) {
+                                        continue;
+                                    }
+                                    //文本标记
+                                    var text = new AMap.Text({
+                                        id: _this.dataList[i].PoiID,
+                                        text: _this.dataList[i].PoiName,
+                                        data: _this.dataList[i],
+                                        cursor: 'pointer',
+                                        // map: this.map,
+                                        position: [longitude, latitude],
+                                        anchor: 'center',
+                                        style: {
+                                            'padding': '0.05rem 0.1rem',
+                                            'margin-bottom': '0rem',
+                                            'border-radius': '0.5rem',
+                                            'background-color': 'rgba(255,255,255,0.8)',
+                                            'border-width': 1,
+                                            'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                            'text-align': 'center',
+                                            'font-size': '12px',
+                                            'color': 'rgba(155,13,20,1)'
+                                        },
+                                    })
+                                    text.setMap(_this.map);
+                                    text.on('click', _this.markerClick);
+                                    _this.markersList.push(text);
+                                }
+                            } else {
+                                // 弹出弹框
+                                Message({
+                                    showClose: true,
+                                    message: '错了哦，这是一条错误消息',
+                                    type: 'error'
+                                });
+                            }
+                        },
+                        error:function(err) {
+                            console.log('请求失败');
+                        }
+                    })
+                },
+
+                // 点击地图上的某一点，就出现类似于弹框的样式
+                markerClick(e) {
+                    for(let i=0;i<this.dataList.length;i++){
+                        if (this.dataList[i].PoiID === e.target.w.id) {
+                            this.localtionTitle = this.dataList[i].PoiName;
+                            // 获得当前位置点与点击的位置点的距离
+                            this.getDistanceBetween(this.dataList[i].position);
+                            this.showLocationMsg(this.dataList[i]);
+                            break;
+                        }
+                    }
+                    // this.setPoiSelected(e,true);
+                }, 
+                
+                //展示当前点击的位置点的信息
+                showLocationMsg(data){
+                    this.isShowDialog = true;
+                    this.localtionDes = data.shortDescribe;
+                },
+
+                // 获取当前位置与点击出的距离
+                getDistanceBetween(position){
+                    var _this = this;
+                    AMap.plugin('AMap.Geolocation', function(){
+                        var geolocation = new AMap.Geolocation({
+                            enableHighAccuracy: true, //是否使用高精度定位，默认:true
+                            timeout: 10000, //超过10秒后停止定位，默认：无穷大
+                            buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+                            zoomToAccuracy: false, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                        });
+                        _this.map.addControl(geolocation);
+                        geolocation.getCurrentPosition(function(status,result){
+                            if(status=='complete'){
+                                console.log(result);
+                            }
+                            if (status == 'error') {
+                                console.log('定位失败');
+                                console.log(result);
+                            }
+                        })
+                    })
+                },
+
+                //点击某一点的位置，出现响应的弹框
+                setPoiSelected(e,isMoveListItem){
+                },
+
+                // 点击地图上的某一点,当点击的点不是地图上定义的标签的时候，就将弹框关闭
+                showInfoClick(e) {
+                    if (!e.target.w.id) {
+                        this.isShowDialog = false;
+                    }
+                },
+
+                //跳转到微信小程序中的详情页面
+                goToWxDetail(){
+                    console.log('可以跳转到微信的详情页面');
+                },
+
+                // 跳转到微信小程序中的全景页面
+                goToWxAllPic() {
+
+                },
+                 
+                // 跳转到微信小程序的路径规划页面中
+                goToWxPath() {
+
+                }
             },
         })
    </script> 
