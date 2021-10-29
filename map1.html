@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&plugin=Map3D,AMap.DistrictLayer,AMap.Scale,AMap.ToolBar,AMap.Transfer,AMap.Geolocation,AMap.plugin,AMap.Pixel"></script>
+    <style>
+        #mapContaimer {
+            height: 85%;
+            width: 100%;
+            position: absolute;
+            left: 0;
+            top: 90px;
+        }
+    </style>
+</head>
+<body>
+    <div id="mapContaimer" style="width:100%;height:100%"></div>
+    <script>
+       var map = new AMap.Map("mapContaimer", {
+                    resizeEnable: true,
+                    expendZoomRange: true,
+                    center: [117.000923,36.675807],
+                    zoom: 16,
+                    pitch: 0,
+                    viewMode: "3D",
+                    
+                });
+    </script>
+</body>
+</html>
