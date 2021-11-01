@@ -19,8 +19,9 @@
     <script src="http://cdn.suoluomei.com/common/js2.0/axios/axios.min.js"></script>
 
     <!-- 引入百度api -->
-    <script src="http://api.map.baidu.com/api?type=webgl&v=1.0&ak=KOLW7eQm1Go0OqW3kCrMHzut5qQO6zzg"></script>
-    <script src="http://bj.bcebos.com/v1/mapopen/api-demos/js/mapStyle.js"></script>
+    <script src="https://map.qq.com/api/gljs?v=1.exp&key=BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF"></script>
+    <!-- <script src="http://api.map.baidu.com/api?type=webgl&v=1.0&ak=KOLW7eQm1Go0OqW3kCrMHzut5qQO6zzg"></script> -->
+    <!-- <script src="http://bj.bcebos.com/v1/mapopen/api-demos/js/mapStyle.js"></script> -->
 
 
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
@@ -166,7 +167,7 @@
                         updateTime: "2021-10-14 18:59:00"
                     },
                     errorDialog: false,
-                    isShowDialog: true,
+                    isShowDialog: false,
                     localtionTitle: '', //当前点击点的位置信息
                     localtionDis: '', //当前位置距位置点的距离
                     localtionDes: '',//当前位置点的简介
@@ -428,30 +429,51 @@
                 }
             },
             mounted() {
+
+                var center = new TMap.LatLng(this.latitude, this.longitude);
+                this.map = new TMap.Map('mapContaimer', {
+                    zoom: 16, //设置地图缩放级别
+                    center: center, //设置地图中心点坐标
+                    viewMode: '3D',
+                    baseMap: {			//底图设置（参数为：VectorBaseMap对象）
+                        type: 'vector',	//类型：失量底图
+                        features: ['base', 'building2d']  
+                    }
+                });
+
+                var imageSW = new TMap.LatLng(36.671882, 117.055539);
+                var imageNE = new TMap.LatLng(36.68114, 117.064508);
+                var imageLatLngBounds = new TMap.LatLngBounds(imageSW, imageNE); // 根据拟覆盖范围的西南角与东北角新建LatLngBounds对象
+                var imageGroundLayer = new TMap.ImageGroundLayer({
+                    bounds: imageLatLngBounds,
+                    src: this.campusPicture, //拟覆盖图片的URL
+                    map: this.map,
+                    opacity: 1
+                });
                 
-                this.map = new BMapGL.Map("mapContaimer");
-                this.map.centerAndZoom(new BMapGL.Point(this.longitude,this.latitude), 17);
-                this.map.enableScrollWheelZoom(true);
-                this.map.setTilt(45);
-                this.map.setDisplayOptions({
-                  poiText: false,  // 隐藏poi标注
-                  poiIcon: false,  // 隐藏poi图标
-                  building: false  // 隐藏楼块
-              });
+            //     this.map = new BMapGL.Map("mapContaimer");
+            //     this.map.centerAndZoom(new BMapGL.Point(this.longitude,this.latitude), 17);
+            //     this.map.enableScrollWheelZoom(true);
+            //     this.map.setTilt(45);
+            //     this.map.setDisplayOptions({
+            //       poiText: false,  // 隐藏poi标注
+            //       poiIcon: false,  // 隐藏poi图标
+            //       building: false  // 隐藏楼块
+            //   });
 
-              // 添加手绘地图图片
-              var pStart = new BMapGL.Point(117.062283,36.677519);
-              var pEnd = new BMapGL.Point(117.071122,36.686983);
-              var bounds = new BMapGL.Bounds(new BMapGL.Point(pStart.lng, pEnd.lat), new BMapGL.Point(pEnd.lng, pStart.lat));
-              var imgOverlay = new BMapGL.GroundOverlay(bounds, {
-                  type: 'image',
-                  url: this.campusPicture,
-                  opacity: 1
-              });
-              this.map.addOverlay(imgOverlay);
+            //   // 添加手绘地图图片
+            //   var pStart = new BMapGL.Point(117.062283,36.677519);
+            //   var pEnd = new BMapGL.Point(117.071122,36.686983);
+            //   var bounds = new BMapGL.Bounds(new BMapGL.Point(pStart.lng, pEnd.lat), new BMapGL.Point(pEnd.lng, pStart.lat));
+            //   var imgOverlay = new BMapGL.GroundOverlay(bounds, {
+            //       type: 'image',
+            //       url: this.campusPicture,
+            //       opacity: 1
+            //   });
+            //   this.map.addOverlay(imgOverlay);
 
 
-              this.map.addEventListener('click', this.showInfoClick)
+              this.map.on('click', this.showInfoClick)
             },
             methods: {
                 //获得页面中的token
@@ -507,10 +529,10 @@
                 */
                 getResultList() {
                     if (this.markersList.length) {
-                      this.markersList.forEach(item => {
-                        console.log(item);
-                      })
-                        // this.map.remove(this.markersList);
+                        this.markersList = [];
+                        this.markersList.forEach(item => {
+                            item.setMap(null)
+                        })
                     }
                     let _this = this;
                     let token = localStorage.getItem('token');
@@ -531,31 +553,60 @@
                                     let latitude = _this.dataList[i].latitude;
 
 
-                                    // 使用百度地图得到的文本标记
-                                    var point = new BMapGL.Point(longitude, latitude);
-                                    var opts = {
-                                      position : point,    // 指定文本标注所在的地理位置
-                                      // offset: new BMapGL.Size(30, -30)    //设置文本偏移量
-                                    }
-                                    var optDes = {
-                                      id: _this.dataList[i].PoiID,
-                                      label: _this.dataList[i].PoiName
-                                    }
-                                    var label = new BMapGL.Label(optDes, opts);  // 创建文本标注对象
-                                    label.setStyle({
-                                      padding: '0.05rem 0.1rem',
-                                      marginBottom: '0rem',
-                                      borderRadius: '0.5rem',
-                                      backgroundColor: 'rgba(255,255,255,0.8)',
-                                      borderWidth: 1,
-                                      boxShadow: '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
-                                      textAlign: 'center',
-                                      fontSize: '12px',
-                                      color: 'rgba(155,13,20,1)'
+                                    var center = new TMap.LatLng(latitude, longitude);//设置中心点坐标
+                                    var label = new TMap.MultiLabel({
+                                        id: 'label-layer',
+                                        map: _this.map, //设置折线图层显示到哪个地图实例中
+                                        //文字标记样式
+                                        styles: {
+                                            'label': new TMap.LabelStyle({
+                                                'padding': '0.05rem 0.1rem',
+                                                'marginBottom': '0rem',
+                                                'borderRadius': '0.5rem',
+                                                // 'fillColor': 'rgba(255,255,255,0.8)',
+                                                'strokeWeight': 10,
+                                                'boxShadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                                'alignment': 'center',
+                                                'size': 14,
+                                                'color': 'rgba(155,13,20,1)'
+                                            })
+                                        },
+                                        //文字标记数据
+                                        geometries: [{
+                                            'id': _this.dataList[i].PoiID, //点图形数据的标志信息
+                                            'styleId': 'label', //样式id
+                                            'position': center, //标注点位置
+                                            'content': _this.dataList[i].PoiName, //标注文本
+                                        }]
                                     });
-                                    _this.map.addOverlay(label);
-                                    label.addEventListener('click', _this.markerClick);
-                                    _this.markersList.push(label);
+                                    label.on('click', _this.markerClick);
+                                     _this.markersList.push(label);
+
+                                    // 使用百度地图得到的文本标记
+                                    // var point = new BMapGL.Point(longitude, latitude);
+                                    // var opts = {
+                                    //   position : point,    // 指定文本标注所在的地理位置
+                                    //   // offset: new BMapGL.Size(30, -30)    //设置文本偏移量
+                                    // }
+                                    // var optDes = {
+                                    //   id: _this.dataList[i].PoiID,
+                                    //   label: _this.dataList[i].PoiName
+                                    // }
+                                    // var label = new BMapGL.Label(optDes, opts);  // 创建文本标注对象
+                                    // label.setStyle({
+                                    //   padding: '0.05rem 0.1rem',
+                                    //   marginBottom: '0rem',
+                                    //   borderRadius: '0.5rem',
+                                    //   backgroundColor: 'rgba(255,255,255,0.8)',
+                                    //   borderWidth: 1,
+                                    //   boxShadow: '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                    //   textAlign: 'center',
+                                    //   fontSize: '12px',
+                                    //   color: 'rgba(155,13,20,1)'
+                                    // });
+                                    // _this.map.addOverlay(label);
+                                    // label.addEventListener('click', _this.markerClick);
+                                    // _this.markersList.push(label);
                                 }
                             } else {
                                 _this.errorDialog = true;
@@ -570,7 +621,11 @@
 
                 getResultData(poiType) {
                     if (this.markersList.length) {
-                        this.map.remove(this.markersList);
+                        this.markersList = [];
+                        this.markersList.forEach(item => {
+                            item.setMap(null)
+                        })
+                        // this.map.remove(this.markersList);
                     }
                     let _this = this;
                     let token = localStorage.getItem('token');
@@ -592,27 +647,56 @@
                                     if (longitude == null || latitude == null) {
                                         continue;
                                     }
-                                    // 使用百度地图得到的文本标记
-                                    var point = new BMapGL.Point(longitude, latitude);
-                                    var opts = {
-                                      position : point,    // 指定文本标注所在的地理位置
-                                      // offset: new BMapGL.Size(30, -30)    //设置文本偏移量
-                                    }
-                                    var label = new BMapGL.Label(_this.dataList[i].PoiName, opts);  // 创建文本标注对象
-                                    label.setStyle({
-                                      padding: '0.05rem 0.1rem',
-                                      marginBottom: '0rem',
-                                      borderRadius: '0.5rem',
-                                      backgroundColor: 'rgba(255,255,255,0.8)',
-                                      borderWidth: 1,
-                                      boxShadow: '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
-                                      textAlign: 'center',
-                                      fontSize: '12px',
-                                      color: 'rgba(155,13,20,1)'
+
+                                    var center = new TMap.LatLng(latitude, longitude);//设置中心点坐标
+                                    var label = new TMap.MultiLabel({
+                                        id: 'label-layer1',
+                                        map: _this.map, //设置折线图层显示到哪个地图实例中
+                                        //文字标记样式
+                                        styles: {
+                                            'label': new TMap.LabelStyle({
+                                                'padding': '0.05rem 0.1rem',
+                                                'marginBottom': '0rem',
+                                                'borderRadius': '0.5rem',
+                                                // 'fillColor': 'rgba(255,255,255,0.8)',
+                                                'strokeWeight': 10,
+                                                'boxShadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                                'alignment': 'center',
+                                                'size': 14,
+                                                'color': 'rgba(155,13,20,1)'
+                                            })
+                                        },
+                                        //文字标记数据
+                                        geometries: [{
+                                            'id': _this.dataList[i].PoiID, //点图形数据的标志信息
+                                            'styleId': 'label', //样式id
+                                            'position': center, //标注点位置
+                                            'content': _this.dataList[i].PoiName, //标注文本
+                                        }]
                                     });
-                                    _this.map.addOverlay(label);
-                                    label.addEventListener('click', _this.markerClick);
-                                    _this.markersList.push(label);
+                                    label.on('click', _this.markerClick);
+                                     _this.markersList.push(label);
+                                    // 使用百度地图得到的文本标记
+                                    // var point = new BMapGL.Point(longitude, latitude);
+                                    // var opts = {
+                                    //   position : point,    // 指定文本标注所在的地理位置
+                                    //   // offset: new BMapGL.Size(30, -30)    //设置文本偏移量
+                                    // }
+                                    // var label = new BMapGL.Label(_this.dataList[i].PoiName, opts);  // 创建文本标注对象
+                                    // label.setStyle({
+                                    //   padding: '0.05rem 0.1rem',
+                                    //   marginBottom: '0rem',
+                                    //   borderRadius: '0.5rem',
+                                    //   backgroundColor: 'rgba(255,255,255,0.8)',
+                                    //   borderWidth: 1,
+                                    //   boxShadow: '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                    //   textAlign: 'center',
+                                    //   fontSize: '12px',
+                                    //   color: 'rgba(155,13,20,1)'
+                                    // });
+                                    // _this.map.addOverlay(label);
+                                    // label.addEventListener('click', _this.markerClick);
+                                    // _this.markersList.push(label);
                                 }
                             } else {
                                 _this.errorDialog = true;
@@ -631,7 +715,11 @@
                         return;
                     }
                     if (this.markersList.length) {
-                        this.map.remove(this.markersList);
+                        this.markersList = [];
+                        this.markersList.forEach(item => {
+                            item.setMap(null)
+                        })
+                        // this.map.remove(this.markersList);
                     }
                     let _this = this;
                     let token = localStorage.getItem('token');
@@ -653,31 +741,60 @@
                                     if (longitude == null || latitude == null) {
                                         continue;
                                     }
-                                    // 使用百度地图得到的文本标记
-                                    var point = new BMapGL.Point(longitude, latitude);
-                                    var opts = {
-                                      position : point,    // 指定文本标注所在的地理位置
-                                      offset: new BMapGL.Size(0, 10)    //设置文本偏移量
-                                    }
-                                    var optDes = {
-                                      id: _this.dataList[i].PoiID,
-                                      label: _this.dataList[i].PoiName
-                                    }
-                                    var label = new BMapGL.Label(optDes, opts);  // 创建文本标注对象
-                                    label.setStyle({
-                                      padding: '0.05rem 0.1rem',
-                                      marginBottom: '0rem',
-                                      borderRadius: '0.5rem',
-                                      backgroundColor: 'rgba(255,255,255,0.8)',
-                                      borderWidth: 1,
-                                      boxShadow: '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
-                                      textAlign: 'center',
-                                      fontSize: '12px',
-                                      color: 'rgba(155,13,20,1)'
+
+                                    var center = new TMap.LatLng(latitude, longitude);//设置中心点坐标
+                                    var label = new TMap.MultiLabel({
+                                        id: 'label-layer2',
+                                        map: _this.map, //设置折线图层显示到哪个地图实例中
+                                        //文字标记样式
+                                        styles: {
+                                            'label': new TMap.LabelStyle({
+                                                'padding': '0.05rem 0.1rem',
+                                                'marginBottom': '0rem',
+                                                'borderRadius': '0.5rem',
+                                                // 'fillColor': 'rgba(255,255,255,0.8)',
+                                                'strokeWeight': 10,
+                                                'boxShadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                                'alignment': 'center',
+                                                'size': 14,
+                                                'color': 'rgba(155,13,20,1)'
+                                            })
+                                        },
+                                        //文字标记数据
+                                        geometries: [{
+                                            'id': _this.dataList[i].PoiID, //点图形数据的标志信息
+                                            'styleId': 'label', //样式id
+                                            'position': center, //标注点位置
+                                            'content': _this.dataList[i].PoiName, //标注文本
+                                        }]
                                     });
-                                    _this.map.addOverlay(label);
-                                    label.addEventListener('click', _this.markerClick);
-                                    _this.markersList.push(label);
+                                    label.on('click', _this.markerClick);
+                                     _this.markersList.push(label);
+                                    // 使用百度地图得到的文本标记
+                                    // var point = new BMapGL.Point(longitude, latitude);
+                                    // var opts = {
+                                    //   position : point,    // 指定文本标注所在的地理位置
+                                    //   offset: new BMapGL.Size(0, 10)    //设置文本偏移量
+                                    // }
+                                    // var optDes = {
+                                    //   id: _this.dataList[i].PoiID,
+                                    //   label: _this.dataList[i].PoiName
+                                    // }
+                                    // var label = new BMapGL.Label(optDes, opts);  // 创建文本标注对象
+                                    // label.setStyle({
+                                    //   padding: '0.05rem 0.1rem',
+                                    //   marginBottom: '0rem',
+                                    //   borderRadius: '0.5rem',
+                                    //   backgroundColor: 'rgba(255,255,255,0.8)',
+                                    //   borderWidth: 1,
+                                    //   boxShadow: '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                    //   textAlign: 'center',
+                                    //   fontSize: '12px',
+                                    //   color: 'rgba(155,13,20,1)'
+                                    // });
+                                    // _this.map.addOverlay(label);
+                                    // label.addEventListener('click', _this.markerClick);
+                                    // _this.markersList.push(label);
                                 }
                             } else {
                                 // 弹出弹框
@@ -742,9 +859,10 @@
 
                 // 点击地图上的某一点,当点击的点不是地图上定义的标签的时候，就将弹框关闭
                 showInfoClick(e) {
-                    if (!e.target.w.id) {
-                        this.isShowDialog = false;
-                    }
+                    console.log(e);
+                    // if (!e.target.w.id) {
+                    //     this.isShowDialog = false;
+                    // }
                 },
 
                 //跳转到微信小程序中的详情页面

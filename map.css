@@ -126,6 +126,7 @@
     left: 25%;
     width: 50%;
     height: 3rem;
+    z-index: 9999;
 }
 .inputBox .el-input {
     background-color: #fff !important;
@@ -218,4 +219,7 @@ input:focus {
 }
 .el-dialog__headerbtn {
     top: 1.5rem !important;
+}
+.label-layer {
+    background-color: aqua;
 }

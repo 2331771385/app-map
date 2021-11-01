@@ -744,9 +744,15 @@
 
                 // 跳转到微信小程序中的全景页面
                 goToWxAllPic() {
-                    wx.miniProgram.navigateTo({
-                        url: ``
-                    });
+                    // 跳转到全景页面中
+                    // let token = localStorage.getItem('token')
+                    let campusId = this.campusId;
+                    let poiName = '校区正门';
+                    // let poiName = this.oneDescription.PoiName;
+                    window.location.href=`http://localhost:8081/allPicture.html?campusId=${campusId}&keyWord=${poiName}`;
+                    // wx.miniProgram.navigateTo({
+                    //     url: '/pages/allPicture/allPicture'
+                    // });
                 },
                  
                 // 跳转到微信小程序的路径规划页面中

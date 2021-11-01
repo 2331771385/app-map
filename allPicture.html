@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>山东大学全景图片</title>
+    <link rel="stylesheet" href="./allPicture.css">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/http-vue-loader"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    
+    <!-- 所需的样式表以及加载器 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="title">
+            <div class="titleIcon" @click='goToBackPage'>
+                <img src="/img/back1.png">
+            </div>
+            <div class="titleContent">{{keyWord}}</div>
+        </div>
+
+        <div id="viewer"></div>
+    </div>
+    <script>
+        // 使用httpVueLoader
+        Vue.use(httpVueLoader);
+
+        new Vue({
+            el: '#app',
+            data: function () {
+                return { 
+                    campusId: '', //当前的校区id
+                    keyWord: '', // 当前点击的位置点名称
+                }
+            },
+            created() {
+                this.transformRem();
+                this.getUrlParams();
+            },
+            methods: {
+                transformRem() {
+                    var winW = document.documentElement.clientWidth || document.body.clientWidth;
+                    document.documentElement.style.fontSize =  (winW *20)/750 + "px"; // 1rem = 10px
+                },
+                // 获得url中的参数
+                getUrlParams() {
+                    var url = decodeURI(location.search); //获取url中"?"符后的字串
+                    var theRequest = new Object();
+                    if (url.indexOf('?') != -1) {
+                        url = url.substr(1);
+                    }
+                    if (url) {
+                        var strs = url.split('&');
+                        for (var i = 0; i < strs.length; i++) {
+                            var srtArry = strs[i].split('=');
+                            var y = srtArry.shift();
+                            theRequest[y] = unescape(srtArry.join('='));
+                        }
+                    }
+                    this.campusId = theRequest.campusId;
+                    this.keyWord = theRequest.keyWord;
+                    // 拿到参数之后，联调接口，获得接口中的详细数据
+                    this.getLocationData();
+                },
+
+                // 获取位置点的详细信息
+                getLocationData() {
+                    var _this = this;
+                    $.ajax({
+                        url: '/poi/getCampusPoiList',
+                        type: 'get',
+                        dataType: 'json',
+                        data: {
+                            token: localStorage.getItem('token'),
+                            ID: this.campusId,
+                            keyWord: this.keyWord
+                        },
+                        success:function(res) {
+                            if (res.recs.length) {
+                                _this.getAllPicture(res.recs[0]);
+                            }
+                        },
+                        error:function(err) {
+
+                        }
+                    })
+                },
+                 //跳转到上一页
+                 goToBackPage() {
+                    wx.miniProgram.navigateTo({
+                        url: '/pages/index/index'
+                    });
+                },
+
+                // 获得当前位置点的全景图
+                getAllPicture(data){
+                    console.log(data);
+                    this.viewer = new PhotoSphereViewer.Viewer({
+                        container: 'viewer',
+                        panorama: data.pic720Url,
+                        defaultLong: data.pic720DefaultLng, //默认水平角度，[0,2π]
+                        defaultLat: data.pic720DefaultLat,//默认垂直角度，[-π/2,π/2]
+                        //定制导航栏
+                        navbar: [
+                            'autorotate',
+                            'zoom',
+                            'caption',
+                        ],
+                        lang: {
+                            autorotate: '自动旋转',
+                            zoom: '放缩',
+                            zoomOut: '缩小',
+                            zoomIn: '放大',
+                            menu: 'Menu',
+                            twoFingers: 'Use two fingers to navigate',
+                            ctrlZoom: 'Use ctrl + scroll to zoom the image',
+                            loadError: '此处没有全景照片! '
+                        }
+                    });
+                }
+
+            },
+        })
+    </script>
+</body>
+</html>

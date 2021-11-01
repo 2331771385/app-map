@@ -1,0 +1,28 @@
+#app {
+    height: 100vh;
+    width: 100vw;
+}
+
+.title {
+    width: 100vw;
+    height: 6vh;
+    background-color: #9b0d14;
+}
+.titleIcon {
+    float: left;
+    width: 10%;
+    line-height: 6vh;
+    text-align: center;
+}
+.titleContent {
+    float: left;
+    width: 80%;
+    text-align: center;
+    line-height: 3.5rem;
+    color: #fff;
+    font-size: 1.8rem;
+}
+#viewer {
+    width: 100vw;
+    height: 94vh;
+}
