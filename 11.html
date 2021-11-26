@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>街景地图</title>
+    <style type="text/css">
+        * {
+            margin: 0px;
+            padding: 0px;
+        }
+        body,
+        button,
+        input,
+        select,
+        textarea {
+            font: 12px/16px Verdana, Helvetica, Arial, sans-serif;
+        }
+        p {
+            width: 603px;
+            padding-top: 3px;
+            overflow: hidden;
+        }
+    </style>
+    <script src="https://map.qq.com/api/js?v=2.exp&key=d84d6d83e0e51e481e50454ccbe8986b"></script>
+</head>
+
+<body onLoad="init()">
+    <script>
+        var init = function() {
+            // 创建街景
+            var pano = new qq.maps.Panorama(document.getElementById('pano_holder'));
+            pano.setOptions({
+                //显示移动箭头显示状态
+                disableMove: false,
+                //隐藏罗盘显示状态
+                disableCompass: true
+            });
+            //设置默认的场景
+            pano.setPano('10011001120131111029111');
+            //设置查看视角
+            pano.setPov({
+                heading: 20,
+                pitch: 15
+            });
+            //设置缩放级别，0<zoom<5
+            pano.setZoom(1);
+            //设置缩放触发事件
+            qq.maps.event.addDomListener(pano, 'zoom_changed', function() {
+                alert('缩放了街景地图级别：' + pano.getZoom());
+            });
+            //显示该街景的id
+
+        }
+    </script>
+    <div style="width:603px;height:300px" id="pano_holder"></div>
+</body>
+
+</html>

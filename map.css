@@ -52,6 +52,7 @@
 }
 .el-select-dropdown {
     background-color: #9b0d14 !important; 
+    z-index: 9999 !important;
 }
 .el-select-dropdown__item,
 .el-select-dropdown__item .selected {
@@ -222,4 +223,31 @@ input:focus {
 }
 .label-layer {
     background-color: aqua;
+}
+.content-label-id {
+    height: 2rem;
+    width: 2rem;
+    background-color: aqua;
+}
+.rotate-circle {
+    display: none !important;
+}
+.tmap-scale-control {
+    display: none !important;
+}
+.logo-text {
+    display: none !important;
+}
+.trace-img {
+    width: 70px;
+    height: 70px;
+    /* background-color: aquamarine; */
+    position: absolute;
+    z-index: 1000;
+    top: 150px;
+    right: 0px;
+}
+.trace-img img {
+    height: 100%;
+    width: 100%;
 }

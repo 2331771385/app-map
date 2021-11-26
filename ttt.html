@@ -15,10 +15,12 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <!-- 引入高德地图 -->
+    
     <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&plugin=Map3D,AMap.DistrictLayer,AMap.Scale,AMap.ToolBar,AMap.Transfer,AMap.Geolocation,AMap.plugin,AMap.Pixel"></script>
     <script src="http://cdn.suoluomei.com/common/js2.0/axios/axios.min.js"></script>
 
-    <!-- 引入百度api -->
+    <!-- 引入腾讯api -->
+    <script src="https://map.qq.com/api/js?v=2.exp&key=BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF"></script>
     <script src="https://map.qq.com/api/gljs?v=1.exp&key=BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF"></script>
     <!-- <script src="http://api.map.baidu.com/api?type=webgl&v=1.0&ak=KOLW7eQm1Go0OqW3kCrMHzut5qQO6zzg"></script> -->
     <!-- <script src="http://bj.bcebos.com/v1/mapopen/api-demos/js/mapStyle.js"></script> -->
@@ -115,7 +117,7 @@
                         <span class="optDetailSpan">
                             <img class="detailImg" src="./img/shijing.png">
                         </span>
-                        <span @click='goToWxAllPic'>全景</span>
+                        <span @click='goToWxAllPic'>街景</span>
                     </div>
                     <div class="optPath">
                         <span class="optDetailSpan">
@@ -133,6 +135,12 @@
             title="无此类数据！"
         >
         </el-dialog>
+
+
+        <!-- 旅游路线 -->
+        <div class="trace-img" @click="goToTracePage">
+            <img src="./img/line_btn.png" />
+        </div>
     </div>
 
    <script>
@@ -143,29 +151,7 @@
             el: '#app',
             data: function () {
                 return { 
-                    oneDescription: {
-                        IsForFreshman: 1,
-                        IsHotspot: 0,
-                        PoiID: 311,
-                        PoiName: "中心校区北门",
-                        PoiSubType: 100,
-                        PoiType: 100,
-                        PoiTypeName: "出入门",
-                        PoiUUID: "705ac3a7-1f64-11ec-95a3-52540036815d",
-                        awesomeIcon: "sign-out",
-                        campusID: 1,
-                        coverPicUrl: "/pic/16275374577538b4d903f-317b-44e1-8978-ea9cb322dcfc.jpg",
-                        detailDescribe: "中心校区北门，是师生进出校园以及具有通行权限的校外车辆进出的地方，配有人脸识别、体温监测等设备。",
-                        latitude: 36.67912,
-                        longitude: 117.05809,
-                        pic720DefaultLat: null,
-                        pic720DefaultLng: null,
-                        pic720Url: null,
-                        picUrls: "/pic/16275374577538b4d903f-317b-44e1-8978-ea9cb322dcfc.jpg",
-                        shortDescribe: "中心校区北门",
-                        state: 0,
-                        updateTime: "2021-10-14 18:59:00"
-                    },
+                    oneDescription: {},
                     errorDialog: false,
                     isShowDialog: false,
                     localtionTitle: '', //当前点击点的位置信息
@@ -429,7 +415,6 @@
                 }
             },
             mounted() {
-
                 var center = new TMap.LatLng(this.latitude, this.longitude);
                 this.map = new TMap.Map('mapContaimer', {
                     zoom: 16, //设置地图缩放级别
@@ -440,7 +425,7 @@
                         features: ['base', 'building2d']  
                     }
                 });
-
+                
                 var imageSW = new TMap.LatLng(36.671882, 117.055539);
                 var imageNE = new TMap.LatLng(36.68114, 117.064508);
                 var imageLatLngBounds = new TMap.LatLngBounds(imageSW, imageNE); // 根据拟覆盖范围的西南角与东北角新建LatLngBounds对象
@@ -450,29 +435,7 @@
                     map: this.map,
                     opacity: 1
                 });
-                
-            //     this.map = new BMapGL.Map("mapContaimer");
-            //     this.map.centerAndZoom(new BMapGL.Point(this.longitude,this.latitude), 17);
-            //     this.map.enableScrollWheelZoom(true);
-            //     this.map.setTilt(45);
-            //     this.map.setDisplayOptions({
-            //       poiText: false,  // 隐藏poi标注
-            //       poiIcon: false,  // 隐藏poi图标
-            //       building: false  // 隐藏楼块
-            //   });
-
-            //   // 添加手绘地图图片
-            //   var pStart = new BMapGL.Point(117.062283,36.677519);
-            //   var pEnd = new BMapGL.Point(117.071122,36.686983);
-            //   var bounds = new BMapGL.Bounds(new BMapGL.Point(pStart.lng, pEnd.lat), new BMapGL.Point(pEnd.lng, pStart.lat));
-            //   var imgOverlay = new BMapGL.GroundOverlay(bounds, {
-            //       type: 'image',
-            //       url: this.campusPicture,
-            //       opacity: 1
-            //   });
-            //   this.map.addOverlay(imgOverlay);
-
-
+                this.map.removeControl(TMap.constants.DEFAULT_CONTROL_ID.ZOOM);
               this.map.on('click', this.showInfoClick)
             },
             methods: {
@@ -529,10 +492,10 @@
                 */
                 getResultList() {
                     if (this.markersList.length) {
-                        this.markersList = [];
                         this.markersList.forEach(item => {
                             item.setMap(null)
-                        })
+                        });
+                        this.markersList = [];
                     }
                     let _this = this;
                     let token = localStorage.getItem('token');
@@ -555,20 +518,21 @@
 
                                     var center = new TMap.LatLng(latitude, longitude);//设置中心点坐标
                                     var label = new TMap.MultiLabel({
-                                        id: 'label-layer',
+                                        id: _this.dataList[i].PoiID,
                                         map: _this.map, //设置折线图层显示到哪个地图实例中
                                         //文字标记样式
                                         styles: {
                                             'label': new TMap.LabelStyle({
-                                                'padding': '0.05rem 0.1rem',
-                                                'marginBottom': '0rem',
-                                                'borderRadius': '0.5rem',
-                                                // 'fillColor': 'rgba(255,255,255,0.8)',
-                                                'strokeWeight': 10,
+                                                'paddingLeft': 5,
+                                                'height': 20,
+                                                'width': 50,
+                                                'size': 12,
+                                                'color': 'rgb(155,13,20)',
+                                                'backgroundColor': 'rgba(255,255,255,1)',
+                                                'borderRadius': 5,
                                                 'boxShadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
                                                 'alignment': 'center',
-                                                'size': 14,
-                                                'color': 'rgba(155,13,20,1)'
+                                                
                                             })
                                         },
                                         //文字标记数据
@@ -576,37 +540,14 @@
                                             'id': _this.dataList[i].PoiID, //点图形数据的标志信息
                                             'styleId': 'label', //样式id
                                             'position': center, //标注点位置
+                                            // 'content': '<div>1111</div>', //标注文本
                                             'content': _this.dataList[i].PoiName, //标注文本
                                         }]
                                     });
+
+                                    
                                     label.on('click', _this.markerClick);
                                      _this.markersList.push(label);
-
-                                    // 使用百度地图得到的文本标记
-                                    // var point = new BMapGL.Point(longitude, latitude);
-                                    // var opts = {
-                                    //   position : point,    // 指定文本标注所在的地理位置
-                                    //   // offset: new BMapGL.Size(30, -30)    //设置文本偏移量
-                                    // }
-                                    // var optDes = {
-                                    //   id: _this.dataList[i].PoiID,
-                                    //   label: _this.dataList[i].PoiName
-                                    // }
-                                    // var label = new BMapGL.Label(optDes, opts);  // 创建文本标注对象
-                                    // label.setStyle({
-                                    //   padding: '0.05rem 0.1rem',
-                                    //   marginBottom: '0rem',
-                                    //   borderRadius: '0.5rem',
-                                    //   backgroundColor: 'rgba(255,255,255,0.8)',
-                                    //   borderWidth: 1,
-                                    //   boxShadow: '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
-                                    //   textAlign: 'center',
-                                    //   fontSize: '12px',
-                                    //   color: 'rgba(155,13,20,1)'
-                                    // });
-                                    // _this.map.addOverlay(label);
-                                    // label.addEventListener('click', _this.markerClick);
-                                    // _this.markersList.push(label);
                                 }
                             } else {
                                 _this.errorDialog = true;
@@ -617,14 +558,14 @@
                         }
                     })
                 },
-
+                
 
                 getResultData(poiType) {
                     if (this.markersList.length) {
-                        this.markersList = [];
                         this.markersList.forEach(item => {
                             item.setMap(null)
                         })
+                        this.markersList = [];
                         // this.map.remove(this.markersList);
                     }
                     let _this = this;
@@ -650,20 +591,26 @@
 
                                     var center = new TMap.LatLng(latitude, longitude);//设置中心点坐标
                                     var label = new TMap.MultiLabel({
-                                        id: 'label-layer1',
+                                        id: _this.dataList[i].PoiID,
                                         map: _this.map, //设置折线图层显示到哪个地图实例中
                                         //文字标记样式
                                         styles: {
                                             'label': new TMap.LabelStyle({
-                                                'padding': '0.05rem 0.1rem',
-                                                'marginBottom': '0rem',
-                                                'borderRadius': '0.5rem',
-                                                // 'fillColor': 'rgba(255,255,255,0.8)',
-                                                'strokeWeight': 10,
-                                                'boxShadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                                'display': 'block',
+                                                'paddingLeft': 5,
+                                                'offset': {
+                                                    x : 1,
+                                                    y : 0.5
+                                                },
+                                                'height': 20,
+                                                'width': 80,
+                                                'size': 13,
+                                                'color': 'rgb(155,13,20)',
+                                                'backgroundColor': 'rgba(255,255,255,0.8)',
+                                                'borderRadius': 5,
+                                                'boxShadow': 'rgb(114 124 245 / 50%) 0px 2px 6px 0px',
                                                 'alignment': 'center',
-                                                'size': 14,
-                                                'color': 'rgba(155,13,20,1)'
+                                                'verticalAlignment': 'middle'
                                             })
                                         },
                                         //文字标记数据
@@ -676,27 +623,6 @@
                                     });
                                     label.on('click', _this.markerClick);
                                      _this.markersList.push(label);
-                                    // 使用百度地图得到的文本标记
-                                    // var point = new BMapGL.Point(longitude, latitude);
-                                    // var opts = {
-                                    //   position : point,    // 指定文本标注所在的地理位置
-                                    //   // offset: new BMapGL.Size(30, -30)    //设置文本偏移量
-                                    // }
-                                    // var label = new BMapGL.Label(_this.dataList[i].PoiName, opts);  // 创建文本标注对象
-                                    // label.setStyle({
-                                    //   padding: '0.05rem 0.1rem',
-                                    //   marginBottom: '0rem',
-                                    //   borderRadius: '0.5rem',
-                                    //   backgroundColor: 'rgba(255,255,255,0.8)',
-                                    //   borderWidth: 1,
-                                    //   boxShadow: '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
-                                    //   textAlign: 'center',
-                                    //   fontSize: '12px',
-                                    //   color: 'rgba(155,13,20,1)'
-                                    // });
-                                    // _this.map.addOverlay(label);
-                                    // label.addEventListener('click', _this.markerClick);
-                                    // _this.markersList.push(label);
                                 }
                             } else {
                                 _this.errorDialog = true;
@@ -715,10 +641,10 @@
                         return;
                     }
                     if (this.markersList.length) {
-                        this.markersList = [];
                         this.markersList.forEach(item => {
                             item.setMap(null)
                         })
+                        this.markersList = [];
                         // this.map.remove(this.markersList);
                     }
                     let _this = this;
@@ -744,20 +670,20 @@
 
                                     var center = new TMap.LatLng(latitude, longitude);//设置中心点坐标
                                     var label = new TMap.MultiLabel({
-                                        id: 'label-layer2',
+                                        id: _this.dataList[i].PoiID,
                                         map: _this.map, //设置折线图层显示到哪个地图实例中
                                         //文字标记样式
                                         styles: {
                                             'label': new TMap.LabelStyle({
-                                                'padding': '0.05rem 0.1rem',
-                                                'marginBottom': '0rem',
-                                                'borderRadius': '0.5rem',
-                                                // 'fillColor': 'rgba(255,255,255,0.8)',
-                                                'strokeWeight': 10,
+                                                'paddingLeft': 5,
+                                                'height': 20,
+                                                'width': 50,
+                                                'size': 14,
+                                                'color': 'rgb(155,13,20)',
+                                                'backgroundColor': 'rgba(255,255,255,0.8)',
+                                                'borderRadius': '5',
                                                 'boxShadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
                                                 'alignment': 'center',
-                                                'size': 14,
-                                                'color': 'rgba(155,13,20,1)'
                                             })
                                         },
                                         //文字标记数据
@@ -769,32 +695,7 @@
                                         }]
                                     });
                                     label.on('click', _this.markerClick);
-                                     _this.markersList.push(label);
-                                    // 使用百度地图得到的文本标记
-                                    // var point = new BMapGL.Point(longitude, latitude);
-                                    // var opts = {
-                                    //   position : point,    // 指定文本标注所在的地理位置
-                                    //   offset: new BMapGL.Size(0, 10)    //设置文本偏移量
-                                    // }
-                                    // var optDes = {
-                                    //   id: _this.dataList[i].PoiID,
-                                    //   label: _this.dataList[i].PoiName
-                                    // }
-                                    // var label = new BMapGL.Label(optDes, opts);  // 创建文本标注对象
-                                    // label.setStyle({
-                                    //   padding: '0.05rem 0.1rem',
-                                    //   marginBottom: '0rem',
-                                    //   borderRadius: '0.5rem',
-                                    //   backgroundColor: 'rgba(255,255,255,0.8)',
-                                    //   borderWidth: 1,
-                                    //   boxShadow: '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
-                                    //   textAlign: 'center',
-                                    //   fontSize: '12px',
-                                    //   color: 'rgba(155,13,20,1)'
-                                    // });
-                                    // _this.map.addOverlay(label);
-                                    // label.addEventListener('click', _this.markerClick);
-                                    // _this.markersList.push(label);
+                                    _this.markersList.push(label);
                                 }
                             } else {
                                 // 弹出弹框
@@ -809,60 +710,30 @@
 
                 // 点击地图上的某一点，就出现类似于弹框的样式
                 markerClick(e) {
-                  console.log(e);
-                    for(let i=0;i<this.dataList.length;i++){
-                        if (this.dataList[i].PoiID == e.target.w.id) {
+                    for(let i = 0;i < this.dataList.length;i++){
+                        if (this.dataList[i].PoiID == e.target.id) {
+                            this.oneDescription = this.dataList[i];
                             this.localtionTitle = this.dataList[i].PoiName;
-                            // 获得当前位置点与点击的位置点的距离
-                            // this.getDistanceBetween(this.dataList[i].position);
                             this.showLocationMsg(this.dataList[i]);
                             break;
                         }
                     }
-                    // this.setPoiSelected(e,true);
                 }, 
                 
                 //展示当前点击的位置点的信息
                 showLocationMsg(data){
                     this.isShowDialog = true;
-                    // Object.assign(this.oneDescription,data);
-                    console.log(this.oneDescription);
                     this.localtionDes = data.shortDescribe;
-                },
-
-                // 获取当前位置与点击出的距离
-                getDistanceBetween(position){
-                    var _this = this;
-                    AMap.plugin('AMap.Geolocation', function(){
-                        var geolocation = new AMap.Geolocation({
-                            enableHighAccuracy: true, //是否使用高精度定位，默认:true
-                            timeout: 10000, //超过10秒后停止定位，默认：无穷大
-                            buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
-                            zoomToAccuracy: false, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
-                        });
-                        _this.map.addControl(geolocation);
-                        geolocation.getCurrentPosition(function(status,result){
-                            if(status=='complete'){
-                                // console.log(result);
-                            }
-                            if (status == 'error') {
-                                // console.log('定位失败');
-                                // console.log(result);
-                            }
-                        })
-                    })
-                },
-
-                //点击某一点的位置，出现响应的弹框
-                setPoiSelected(e,isMoveListItem){
                 },
 
                 // 点击地图上的某一点,当点击的点不是地图上定义的标签的时候，就将弹框关闭
                 showInfoClick(e) {
-                    console.log(e);
-                    // if (!e.target.w.id) {
-                    //     this.isShowDialog = false;
-                    // }
+                    let flag = false;
+                    for(let i = 0; i < this.dataList.length; i++){
+                        if (this.dataList[i].PoiID != e.target.id) {
+                            this.isShowDialog = false;
+                        }
+                    }
                 },
 
                 //跳转到微信小程序中的详情页面
@@ -874,15 +745,22 @@
 
                 // 跳转到微信小程序中的全景页面
                 goToWxAllPic() {
-                    wx.miniProgram.navigateTo({
-                        url: ``
-                    });
+                    console.log(this.oneDescription);
+                    let poiName = this.oneDescription.PoiName;
+                    let poiID = this.oneDescription.PoiID;
+                    let lat = this.oneDescription.latitude;
+                    let lng = this.oneDescription.longitude;
+                    let campusName = this.oneDescription.campusName;
+                    window.location.href=`treePicture.html?campusName=${campusName}&poiID=${poiID}&poiName=${poiName}&lat=${lat}&lng=${lng}&campusId=${this.campusId}`;
                 },
                  
                 // 跳转到微信小程序的路径规划页面中
                 goToWxPath() {
+                    let endPoint = this.oneDescription.PoiName;
+                    let lat = this.oneDescription.latitude;
+                    let lng = this.oneDescription.longitude;
                     wx.miniProgram.navigateTo({
-                        url: ''
+                        url: `/pages/planRouter/planRouter?endPoint=${endPoint}&lat=${lat}&lng=${lng}`
                     });
                 },
 
@@ -891,6 +769,11 @@
                     wx.miniProgram.navigateTo({
                         url: '/pages/index/index'
                     });
+                },
+
+                // 点击跳转到校园浏览页面
+                goToTracePage() {
+                    window.location.href = `traceRouter.html?campusId=${this.campusId}&campusName=${this.campusName}`;
                 }
             },
         })

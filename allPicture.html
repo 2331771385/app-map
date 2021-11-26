@@ -86,6 +86,7 @@
                             keyWord: this.keyWord
                         },
                         success:function(res) {
+                            console.log(res.recs);
                             if (res.recs.length) {
                                 _this.getAllPicture(res.recs[0]);
                             }
@@ -97,14 +98,15 @@
                 },
                  //跳转到上一页
                  goToBackPage() {
+                     
                     wx.miniProgram.navigateTo({
-                        url: '/pages/index/index'
+                        url: `/pages/out/out?campusId=${this.campusId}&campusName=${this.keyWord}`,
+                        // url: '/pages/index/index'
                     });
                 },
 
                 // 获得当前位置点的全景图
                 getAllPicture(data){
-                    console.log(data);
                     this.viewer = new PhotoSphereViewer.Viewer({
                         container: 'viewer',
                         panorama: data.pic720Url,

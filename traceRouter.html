@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>各校区的旅游路线</title>
+    <link rel="stylesheet" href="./traceRouter.css" />
+    <!-- 先引入 Vue -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- 引入 http-vue-loader -->
+    <script src="https://unpkg.com/http-vue-loader"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&plugin=Map3D,AMap.DistrictLayer,AMap.Scale,AMap.ToolBar,AMap.Transfer,AMap.Geolocation,AMap.plugin,AMap.Pixel"></script>
+    <script src="http://cdn.suoluomei.com/common/js2.0/axios/axios.min.js"></script>
+
+    <!-- 引入腾讯api -->
+    <script src="https://map.qq.com/api/js?v=2.exp&key=BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF"></script>
+    <script src="https://map.qq.com/api/gljs?v=1.exp&key=BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF&libraries=geometry"></script>
+    <!-- 引入腾讯模块CDN -->
+    <script  type="text/javascript" src="https://3gimg.qq.com/lightmap/components/geolocation/geolocation.min.js"></script>
+
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <script src="https://webapi.amap.com/ui/1.1/main.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="divTitlebar" >
+            <div class="divTitlebarLeft" >
+                <img src="/images/back1.png" @click='goToBackPage'/>
+            </div>
+            <div class="divTitlebarCenter" >
+                <span>{{pageName}}</span>
+            </div>
+        </div>
+        <!-- 地图以及手绘地图的贴图 -->
+        <div id="mapContaimer"></div>
+
+        <!-- 点击其中的图表出现弹框 -->
+        <div class="Dialog" v-if="isShowDialog">
+            <div class="dialog-content">
+                <div class="dialog-left">
+                    <div class="dialog-left-text">{{pageName}}</div>
+                    <div class="dialog-left-point">
+                        <span>{{selectedPointArray.length}}处景观</span>
+                        <span class="left-time">{{timer}}</span>
+                        <span class="left-distance">{{distance}}</span>
+                    </div>
+                    <div class="dialog-left-labels">
+                        <div 
+                            class="dialog-left-label"
+                            v-for="item in labelsArr" 
+                            :key="item.id" 
+                            :label="item.label" 
+                            :value="item.id"
+                        >
+                            {{item.label}}
+                        </div>
+                    </div>
+                </div>
+                <div class="dialog-right">
+                    <div class="dialog-right-radis" @click="goToStart">
+                        <span class="dialog-right-text">开始浏览</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 浏览的弹框，关闭掉首页的浏览弹框 -->
+        <div class="detail-dialog" 
+            v-if="!isShowDialog" 
+            v-tap="vuetouch" 
+            v-longtap="{fn:vuetouch,name:'长按'}" 
+            v-swipeleft="{fn:vuetouch,name:'左滑'}"
+            v-swiperight="{fn:vuetouch,name:'右滑'}"
+        >
+            <div 
+                class="detail-dialog-content" 
+                v-for="(item,index) in allDataArr"
+                :key="item.PoiID"
+                v-if="index == selectedIndex"
+            >
+                <div class="title">
+                    <span class="title-number">{{index+1}}</span>
+                    <span class="title-content">{{item.PoiName}}</span>
+                </div>
+                <div class="distance">
+                    <span>距你{{withDistance}}</span>
+                </div>
+                <div class="des">
+                    <span >{{item.detailDescribe}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        Vue.use(httpVueLoader);
+
+        new Vue({
+            el: '#app',
+            data: function () {
+                return { 
+                    pageName: '山竹姗姗的一天',
+                    lngAndLatList: [
+                        {
+                            id: 1,
+                            longitude: 117.060109, // 经度
+                            latitude: 36.675668,
+                            markerImg: './img/3d-zhongxin3.png',
+                            studentPath:[
+                                [36.672, 117.0602], // 校区正门
+                                [36.673259, 117.060173], //大成广场
+                                [36.673835,117.06013], // 图书馆
+                                [36.673921,117.060125],
+                                [36.673921,117.059299],
+                                [36.674201,117.059299], // 蒋维崧雕像
+                                [36.675367,117.059304], // 历史系八大教授群像
+                                [36.67538,117.057888], // 冯沅君陆侃如雕像
+                                [36.67541,117.057464],
+                                [36.675745,117.05747], // 学生公寓3号楼
+                                [36.67621,117.057475], // 学生公寓4号楼
+                                [36.676189,117.057475],
+                                [36.676288,117.05747],
+                                [36.676249,117.058253],
+                                [36.676275,117.058661], // 齐园餐厅
+                                [36.676318,117.05931],
+                                [36.67646,117.059315],
+                                [36.676761,117.059315],
+                                [36.676795,117.059304], //知新楼
+                                [36.677131,117.059304], // 体育场
+                                [36.677092,117.05813],
+                                [36.677565,117.058124], // 文学生活馆
+                                [36.678482,117.058092], // 天猫校园
+                                [36.679015,117.058087], //北门
+                                [36.678989,117.058698],
+                                [36.678985,117.058956],
+                                [36.67905,117.059621],
+                                [36.679075,117.0599],
+                                // [36.679144,117.060254],
+                                [36.678959,117.060833],
+                                [36.678964,117.061042],
+                                [36.678611,117.061101],
+                                [36.677195,117.061177], //知新楼B
+                                [36.677195,117.062603], // 知新楼C
+                                [36.676636,117.062614], // 13号宿舍楼
+                                [36.676374,117.062614],
+                                [36.675853,117.062614],//留学生公寓
+                                [36.675384,117.062587],
+                                [36.675384,117.061987], //成仿吾雕像
+                                [36.675388,117.06167], // 孔子雕像
+                                [36.675393,117.06094],
+                                [36.674954,117.06094],
+                                [36.674967,117.062201], // 公教楼
+                                [36.674984,117.062598],
+                                [36.674326,117.062603], // 生命科学园
+                                [36.674321,117.062137], //晶体研究所
+                                [36.6743,117.060924],
+                                [36.673448,117.060914], // 明德楼A
+                                [36.673465,117.062582],
+                                [36.672673,117.06255],
+                                [36.672652,117.060683],
+                                [36.672321,117.060662]
+                            ],
+                            studentPointArr: [
+                                {
+                                    id: '1',
+                                    value: '校区正门',
+                                    labelImg: './img/zx1.png'
+                                },
+                                {
+                                    id: '2',
+                                    value: '大成广场',
+                                    labelImg: './img/zx2.png'
+                                },
+                                {
+                                    id: '3',
+                                    value: '图书馆',
+                                    labelImg: './img/zx3.png'
+                                },
+                                {
+                                    id: '4',
+                                    value: '蒋维崧雕像',
+                                    labelImg: './img/zx4.png'
+                                },
+                                {
+                                    id: '5',
+                                    value: '八大教授雕像',
+                                    labelImg: './img/zx5.png'
+                                },
+                                {
+                                    id: '6',
+                                    value: '冯沅君陆侃如雕像',
+                                    labelImg: './img/zx6.png'
+                                },
+                                {
+                                    id: '7',
+                                    value: '学生公寓3号楼',
+                                    labelImg: './img/zx7.png'
+                                },
+                                {
+                                    id: '8',
+                                    value: '学生公寓4号楼',
+                                    labelImg: './img/zx8.png'
+                                },
+                                {
+                                    id: '9',
+                                    value: '综合服务楼(食堂)',
+                                    labelImg: './img/zx9.png'
+                                },
+                                {
+                                    id: '10',
+                                    value: '知新楼A区',
+                                    labelImg: './img/zx10.png'
+                                },
+                                {
+                                    id: '11',
+                                    value: '体育场',
+                                    labelImg: './img/zx11.png'
+                                },
+                                {
+                                    id: '12',
+                                    value: '文学生活馆',
+                                    labelImg: './img/zx12.png'
+                                },
+                                {
+                                    id: '13',
+                                    value: '中心校区北门',
+                                    labelImg: './img/zx13.png'
+                                },
+                                {
+                                    id: '14',
+                                    value: '中心校区体育馆',
+                                    labelImg: './img/zx14.png'
+                                },
+                                {
+                                    id: '15',
+                                    value: '知新楼B区',
+                                    labelImg: './img/zx15.png'
+                                },
+                                {
+                                    id: '16',
+                                    value: '知新楼C区',
+                                    labelImg: './img/zx16.png'
+                                },
+                                {
+                                    id: '17',
+                                    value: '学生公寓13号楼',
+                                    labelImg: './img/zx17.png'
+                                },
+                                {
+                                    id: '18',
+                                    value: '留学生公寓',
+                                    labelImg: './img/zx18.png'
+                                },
+                                {
+                                    id: '19',
+                                    value: '孔子雕像',
+                                    labelImg: './img/zx19.png'
+                                },
+                                {
+                                    id: '20',
+                                    value: '成仿吾雕像',
+                                    labelImg: './img/zx20.png'
+                                },
+                                {
+                                    id: '21',
+                                    value: '公教楼',
+                                    labelImg: './img/zx21.png'
+                                },
+                                {
+                                    id: '22',
+                                    value: '生命科学院',
+                                    labelImg: './img/zx22.png'
+                                },
+                                {
+                                    id: '23',
+                                    value: '晶体材料研究所',
+                                    labelImg: './img/zx23.png'
+                                },
+                                {
+                                    id: '24',
+                                    value: '明德楼A区',
+                                    labelImg: './img/zx24.png'
+                                }
+                            ]
+                        },
+                        {
+                            id: 6,
+                            longitude: 117.143552,
+                            latitude: 36.666811,
+                            markerImg: './img/3d-software.png'
+                        },
+                        {
+                            id: 2,
+                            longitude: 117.068195,
+                            latitude: 36.687395,
+                            markerImg: './img/3d-hongjialou1.png'
+                        },
+                        {
+                            id: 5,
+                            longitude: 117.028551,
+                            latitude: 36.651162,
+                            markerImg: './img/3d-qianfoshan3.png'
+                        },
+                        {
+                            id: 4,
+                            longitude: 117.050303,
+                            latitude: 36.601063,
+                            markerImg: './img/3d-xinglongshan.png'
+                        },
+                        {
+                            id: 3,
+                            longitude: 117.018274,
+                            latitude: 36.652161,
+                            markerImg: './img/3d-baotuquan3.png'
+                        },
+                        {
+                            id: 9,
+                            longitude: 117.454672,
+                            latitude: 36.685585
+                        },
+                        {
+                            id: 7,
+                            longitude: 120.688292,
+                            latitude: 36.365274,
+                            markerImg: './img/3d-qingdao3.png'
+                        },
+                        {
+                            id: 8,
+                            longitude: 122.058225,
+                            latitude: 37.532313,
+                            markerImg: './img/3d-weihai5.png'
+                        }
+                    ],
+                    campusId: '',
+                    campusName: '',
+                    longitude: '',
+                    latitude: '',
+                    campusPicture: '',
+                    latLngArray: [],
+                    selectedPointArray: [],
+                    dataList: [],
+                    isShowDialog: true,
+                    labelsArr: [
+                        {
+                            id: '1',
+                            label: '校园风光'
+                        },
+                        {
+                            id: '2',
+                            label: '自然景观'
+                        },
+                        {
+                            id: '3',
+                            label: '打卡胜地'
+                        }
+                    ],
+                    timer: '2小时',
+                    distance: '',
+                    allDataArr: [], // 需要展示的所有按序号排列的数据，
+                    selectedIndex: 0,
+                    withDistance: '',
+                    timerArr: [
+                        {
+                            id: 1,
+                            timer: ''
+                        }
+                    ]
+                }
+            },
+            created() {
+                this.getSearchVal(); // 得到url中的参数
+                
+            },
+            mounted() {
+                var center = new TMap.LatLng(this.latitude, this.longitude);
+                this.map = new TMap.Map('mapContaimer', {
+                    zoom: 16, //设置地图缩放级别
+                    center: center, //设置地图中心点坐标
+                    viewMode: '3D',
+                    baseMap: {			//底图设置（参数为：VectorBaseMap对象）
+                        type: 'vector',	//类型：失量底图
+                        features: ['base', 'building2d']  
+                    }
+                });
+                
+                var imageSW = new TMap.LatLng(36.671882, 117.055539);
+                var imageNE = new TMap.LatLng(36.68114, 117.064508);
+                var imageLatLngBounds = new TMap.LatLngBounds(imageSW, imageNE); // 根据拟覆盖范围的西南角与东北角新建LatLngBounds对象
+                var imageGroundLayer = new TMap.ImageGroundLayer({
+                    bounds: imageLatLngBounds,
+                    src: this.campusPicture, //拟覆盖图片的URL
+                    map: this.map,
+                    opacity: 1
+                });
+                this.map.removeControl(TMap.constants.DEFAULT_CONTROL_ID.ZOOM);
+                this.drawPioly()
+            },
+            methods: {
+                // 返回上一页面
+                goToBackPage() {
+                    window.location.href=`ttt.html?campusId=${this.campusId}&campusName=${this.campusName}`;
+                },
+                getSearchVal() {
+                    var url = decodeURI(location.search); //获取url中"?"符后的字串
+                    var theRequest = new Object();
+                    if (url.indexOf('?') != -1) {
+                        url = url.substr(1);
+                    }
+                    if (url) {
+                        var strs = url.split('&');
+                        for (var i = 0; i < strs.length; i++) {
+                            var srtArry = strs[i].split('=');
+                            var y = srtArry.shift();
+                            theRequest[y] = unescape(srtArry.join('='));
+                        }
+                    }
+                    this.campusId = theRequest.campusId;
+                    this.campusName = theRequest.campusName;
+                    this.getLogAndLat();
+                },
+                getLogAndLat() {
+                    this.lngAndLatList.forEach(item => {
+                        if(item.id == this.campusId) {
+                            this.longitude = item.longitude;
+                            this.latitude = item.latitude;
+                            this.selectedPointArray = item.studentPointArr;
+                            this.campusPicture = item.markerImg;
+                            this.latLngArray = item.studentPath;
+                        }
+                    });
+                    // 两点之间的路径距离
+                    this.getTwoPointDistance();
+                    this.latLngArray = this.latLngArray.map( p => {
+                        return new TMap.LatLng(p[0],p[1])
+                    });
+                    this.selectedPointArray.forEach( item => {
+                        this.getPointDetailLocation(item.value); // 得到位置点的具体信息
+                    })
+                },
+
+                // 画出路径规划
+                drawPioly() {
+                    var polylineLayer = new TMap.MultiPolyline({
+                        id: 'polyline-layer', //图层唯一标识
+                        map: this.map,//绘制到目标地图
+                        //折线样式定义
+                        styles: {
+                            'style_blue': new TMap.PolylineStyle({
+                                'color': '#f58430', //线填充色
+                                'width': 4, //折线宽度
+                            })
+                        },
+                        //折线数据定义
+                        geometries: [
+                            {//第1条线
+                                'id': 'pl_1',//折线唯一标识，删除时使用
+                                'styleId': 'style_blue',//绑定样式名
+                                'paths': this.latLngArray
+                            },
+                            
+                        ]
+                    });
+                },
+                
+                // 得到位置点的具体信息
+                getPointDetailLocation(val) {
+                    let _this = this;
+                    let token = localStorage.getItem('token');
+                    $.ajax({
+                        url: '/poi/getCampusPoiList',
+                        type: 'get',
+                        dataType: 'json',
+                        data: {
+                            token: token,
+                            ID: this.campusId,
+                            keyWord: val
+                        },
+                        success:function(res) {
+                            if (res.recs.length == 1) {
+                                _this.dataList.push(res.recs[0])
+                            } else if (res.recs.length > 1) {
+                                for(let i = 0; i < res.recs.length; i++) {
+                                    if (res.recs[i].PoiName == val) {
+                                        _this.dataList.push(res.recs[i]);
+                                        break
+                                    }
+                                }
+                            }
+                            if (_this.dataList.length == _this.selectedPointArray.length) {
+                                _this.showNumberInMap();
+                            }
+                            
+                        },
+                        error:function(err) {
+                            console.log('请求失败');
+                        }
+                    })
+                },
+
+                // 将所有的标记显示在地图上
+                showNumberInMap(){
+                    let len1 = this.dataList;
+                    let len2 = this.selectedPointArray;
+                    for(let j = 0; j < len2.length; j++) {
+                        for(let i = 0; i < len1.length; i++) {
+                            if (len2[j].value == len1[i].PoiName) {
+                                this.allDataArr.push(len1[i])
+                                let lat = len1[i].latitude;
+                                let lng = len1[i].longitude;
+                                let poiIndex = len1[i].PoiID;
+                                let content = len2[j].id;
+
+                                var center = new TMap.LatLng(lat, lng);//设置中心点坐标
+                                var label = new TMap.MultiLabel({
+                                    id: poiIndex,
+                                    map: this.map, //设置折线图层显示到哪个地图实例中
+                                    //文字标记样式
+                                    styles: {
+                                        'label': new TMap.LabelStyle({
+                                            'paddingLeft': 5,
+                                            'height': 20,
+                                            'width': 20,
+                                            'size': 12,
+                                            // 'color': 'rgb(155,13,20)',
+                                            'color': '#fff',
+                                            'backgroundColor': '#f58430',
+                                            'borderRadius': 10,
+                                            'alignment': 'center',
+                                            
+                                        })
+                                    },
+                                    //文字标记数据
+                                    geometries: [{
+                                        'id': poiIndex, //点图形数据的标志信息
+                                        'styleId': 'label', //样式id
+                                        'position': center, //标注点位置
+                                        'content': content, //标注文本
+                                    }]
+                                });
+                                break;
+                            }
+                        }
+                    }
+                },
+
+                goToStart() {
+                    this.isShowDialog = false;
+                    let index = this.selectedIndex;
+                    let id = this.allDataArr[this.selectedIndex].PoiID;;
+                    let lat = this.allDataArr[this.selectedIndex].latitude;
+                    let lng = this.allDataArr[this.selectedIndex].longitude;
+
+                    let labelImg;
+                    for(let i = 0; i < this.selectedPointArray.length; i++) {
+                        if (this.selectedPointArray[i].id == index + 1) {
+                            labelImg = this.selectedPointArray[i].labelImg;
+                            break;
+                        }
+                    };
+
+                    var geolocation = new qq.maps.Geolocation("BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF", "myapp");  // xx-xx-xx-xx为开发密钥，腾讯位置服务申请 http://lbs.qq.com/guides/startup.html
+                    if (geolocation) {
+                        geolocation.getLocation((position) => {
+                            let lat1 = position.lat;
+                            let lng1 = position.lng;
+                            let startPoi = new TMap.LatLng(lat1, lng1);
+                            let endPoi = new TMap.LatLng(lat, lng);
+                            let path = [startPoi, endPoi];
+                            var dis = TMap.geometry.computeDistance(path);
+                            if (dis < 1000) {
+                                this.withDistance = dis.toFixed(0) + '米';
+                            } else {
+                                this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里"
+                            }
+                        }, this.error);
+                    } else {
+                        console.log('不支持');
+                    }
+
+                    let center = new TMap.LatLng(lat, lng);
+                    this.marker = new TMap.MultiMarker({
+                        id: `demo${this.selectedIndex}`,
+                        map: this.map,
+                        styles: {
+                            "marker": new TMap.MarkerStyle({
+                                "width": 80,
+                                "height": 90,
+                                "src": labelImg
+                            })
+                        },
+                        geometries: [{
+                            id: `demo${this.selectedIndex}`,
+                            styleId: 'marker',
+                            position: center,
+                            properties: {
+                                "title": "marker"
+                            }
+                        }]
+                    });
+                    this.map.setCenter(center);
+                },
+
+                vuetouch:function(s,e){
+                    if (s.name == '左滑') {
+                        this.selectedIndex++;
+                        if (this.selectedIndex == this.allDataArr.length) {
+                            this.selectedIndex--;
+                        }
+                    } else if (s.name == '右滑') {
+                        this.selectedIndex--;
+                        if (this.selectedIndex == -1) {
+                            this.selectedIndex++;
+                        }
+                    }
+
+                    if (this.marker) {
+                        this.marker.setMap(null);
+                        this.marker = null;
+                    }
+                    let lat = this.allDataArr[this.selectedIndex].latitude;
+                    let lng = this.allDataArr[this.selectedIndex].longitude;
+
+                    let index = this.selectedIndex;
+                    let labelImg;
+                    for(let i = 0; i < this.selectedPointArray.length; i++) {
+                        if (this.selectedPointArray[i].id == index + 1) {
+                            labelImg = this.selectedPointArray[i].labelImg;
+                            break;
+                        }
+                    }
+
+                    var geolocation = new qq.maps.Geolocation("BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF", "myapp");  // xx-xx-xx-xx为开发密钥，腾讯位置服务申请 http://lbs.qq.com/guides/startup.html
+                    if (geolocation) {
+                        geolocation.getLocation((position) => {
+                            let lat1 = position.lat;
+                            let lng1 = position.lng;
+                            let startPoi = new TMap.LatLng(lat1, lng1);
+                            let endPoi = new TMap.LatLng(lat, lng);
+                            let path = [startPoi, endPoi];
+                            var dis = TMap.geometry.computeDistance(path);
+                            if (dis < 1000) {
+                                this.withDistance = dis.toFixed(0) + '米';
+                            } else {
+                                this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里"
+                            }
+                        }, this.error);
+                    } else {
+                        console.log('不支持');
+                    }
+
+                    let center = new TMap.LatLng(lat, lng);
+                    this.marker = new TMap.MultiMarker({
+                        id: `demo${this.selectedIndex}`,
+                        map: this.map,
+                        styles: {
+                            "marker": new TMap.MarkerStyle({
+                                "width": 80,
+                                "height": 90,
+                                "src": labelImg
+                            })
+                        },
+                        geometries: [{
+                            "id": `demo${this.selectedIndex}`,
+                            "styleId": 'marker',
+                            "position": center,
+                            "properties": {
+                                "title": "marker"
+                            }
+                        }]
+                    });
+                    this.map.setCenter(center);
+                },
+
+                getTwoPointDistance() {
+                    let distance = 0;
+                    for(let i = 0; i < this.latLngArray.length-1; i++) {
+                        let startPoint = new TMap.LatLng(this.latLngArray[i][0], this.latLngArray[i][1]);
+                        let endPoint = new TMap.LatLng(this.latLngArray[i+1][0], this.latLngArray[i+1][1]);
+                        let path = [startPoint, endPoint];
+                        var dis = TMap.geometry.computeDistance(path);
+                        distance += dis;
+                    };
+                    if (distance < 1000) {
+                        this.distance = distance.toFixed(0) + '米';
+                    } else {
+                        this.distance = (Math.round(distance/100)/10).toFixed(1) + "公里"
+                    }
+                },
+                
+                error() {
+                    console.log('失败的回调');
+                },
+            },
+        })
+
+        
+        function vueTouch(el,binding,type){
+            var _this=this;
+            this.obj=el;
+            this.binding=binding;
+            this.touchType=type;
+            this.vueTouches={x:0,y:0};
+            this.vueMoves=true;
+            this.vueLeave=true;
+            this.longTouch=true;
+            this.vueCallBack=typeof(binding.value)=="object"?binding.value.fn:binding.value;
+            this.obj.addEventListener("touchstart",function(e){
+                _this.start(e);
+            },false);
+            this.obj.addEventListener("touchend",function(e){
+                _this.end(e);
+            },false);
+            this.obj.addEventListener("touchmove",function(e){
+                _this.move(e);
+            },false);
+        };
+        vueTouch.prototype={
+            start:function(e){
+                this.vueMoves=true;
+                this.vueLeave=true;
+                this.longTouch=true;
+                this.vueTouches={x:e.changedTouches[0].pageX,y:e.changedTouches[0].pageY};
+                this.time=setTimeout(function(){
+                    if(this.vueLeave&&this.vueMoves){
+                        this.touchType=="longtap"&&this.vueCallBack(this.binding.value,e);
+                        this.longTouch=false;
+                    };
+                }.bind(this),1000);
+            },
+            end:function(e){
+                var disX=e.changedTouches[0].pageX-this.vueTouches.x;
+                var disY=e.changedTouches[0].pageY-this.vueTouches.y;
+                clearTimeout(this.time);
+                if(Math.abs(disX)>10||Math.abs(disY)>100){
+                    this.touchType=="swipe"&&this.vueCallBack(this.binding.value,e);
+                    if(Math.abs(disX)>Math.abs(disY)){
+                        if(disX>10){
+                            this.touchType=="swiperight"&&this.vueCallBack(this.binding.value,e);
+                        };
+                        if(disX<-10){
+                            this.touchType=="swipeleft"&&this.vueCallBack(this.binding.value,e);
+                        };
+                    }else{
+                        if(disY>10){
+                            this.touchType=="swipedown"&&this.vueCallBack(this.binding.value,e);
+                        };
+                        if(disY<-10){
+                            this.touchType=="swipeup"&&this.vueCallBack(this.binding.value,e);
+                        }; 
+                    };
+                }else{
+                    if(this.longTouch&&this.vueMoves){
+                        this.touchType=="tap"&&this.vueCallBack(this.binding.value,e);
+                        this.vueLeave=false
+                    };
+                };
+            },
+            move:function(e){
+                this.vueMoves=false;
+            }
+        };
+        Vue.directive("tap",{
+            bind:function(el,binding){
+                new vueTouch(el,binding,"tap");
+            }
+        });
+        Vue.directive("swipe",{
+            bind:function(el,binding){
+                new vueTouch(el,binding,"swipe");
+            }
+        });
+        Vue.directive("swipeleft",{
+            bind:function(el,binding){
+                new vueTouch(el,binding,"swipeleft");
+            }
+        });
+        Vue.directive("swiperight",{
+            bind:function(el,binding){
+                new vueTouch(el,binding,"swiperight");
+            }
+        });
+        Vue.directive("swipedown",{
+            bind:function(el,binding){
+                new vueTouch(el,binding,"swipedown");
+            }
+        });
+        Vue.directive("swipeup",{
+            bind:function(el,binding){
+                new vueTouch(el,binding,"swipeup");
+            }
+        });
+        Vue.directive("longtap",{
+            bind:function(el,binding){
+                new vueTouch(el,binding,"longtap");
+            }
+        });
+    </script>
+</body>
+</html>
