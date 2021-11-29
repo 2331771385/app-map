@@ -308,7 +308,9 @@
                             id: 1,
                             longitude: 117.060109, // 经度
                             latitude: 36.675668,
-                            markerImg: './img/3d-zhongxin3.png'
+                            markerImg: './img/3d-zhongxin3.png',
+                            leftButton: [36.671882, 117.055539],
+                            rightTop: [36.68114, 117.064508]
                         },
                         {
                             id: 6,
@@ -338,7 +340,9 @@
                             id: 3,
                             longitude: 117.018274,
                             latitude: 36.652161,
-                            markerImg: './img/3d-baotuquan3.png'
+                            markerImg: './img/3d-baotuquan3.png',
+                            leftButton: [36.64884,117.014293],
+                            rightTop: [36.655364,117.022919]
                         },
                         {
                             id: 9,
@@ -369,6 +373,8 @@
                     token: '', // 访问页面调用的token
                     dataList: [], //调用接口返回的数据
                     markersList: [], //点标记的数组，可能一次会加入很多点
+                    leftButton: [],
+                    rightTop: []
                 }
             },
             created() {
@@ -426,8 +432,10 @@
                     }
                 });
                 
-                var imageSW = new TMap.LatLng(36.671882, 117.055539);
-                var imageNE = new TMap.LatLng(36.68114, 117.064508);
+                var imageSW = new TMap.LatLng(this.leftButton[0], this.leftButton[1]);
+                var imageNE = new TMap.LatLng(this.rightTop[0], this.rightTop[1]);
+                // var imageSW = new TMap.LatLng(36.671882, 117.055539);
+                // var imageNE = new TMap.LatLng(36.68114, 117.064508);
                 var imageLatLngBounds = new TMap.LatLngBounds(imageSW, imageNE); // 根据拟覆盖范围的西南角与东北角新建LatLngBounds对象
                 var imageGroundLayer = new TMap.ImageGroundLayer({
                     bounds: imageLatLngBounds,
@@ -481,6 +489,8 @@
                             this.longitude = item.longitude;
                             this.latitude = item.latitude;
                             this.campusPicture = item.markerImg;
+                            this.leftButton = item.leftButton;
+                            this.rightTop = item.rightTop;
                         }
                     });
                 },
@@ -722,18 +732,84 @@
                 
                 //展示当前点击的位置点的信息
                 showLocationMsg(data){
+                    let center = new TMap.LatLng(data.latitude, data.longitude);
+                    this.map.setCenter(center);
                     this.isShowDialog = true;
                     this.localtionDes = data.shortDescribe;
                 },
 
                 // 点击地图上的某一点,当点击的点不是地图上定义的标签的时候，就将弹框关闭
                 showInfoClick(e) {
-                    let flag = false;
-                    for(let i = 0; i < this.dataList.length; i++){
-                        if (this.dataList[i].PoiID != e.target.id) {
-                            this.isShowDialog = false;
-                        }
+                    if (this.isShowDialog) {
+                        this.isShowDialog = false;
                     }
+                    let _this = this;
+                    let token = localStorage.getItem('token');
+                    $.ajax({
+                        url: '/poi/getKNNCampusPoiList',
+                        type: 'get',
+                        dataType: 'json',
+                        data: {
+                            token: token,
+                            ID: this.campusId,
+                            lng: e.latLng.lng,
+                            lat: e.latLng.lat
+                        },
+                        success:function(res) {
+                            if (res.recs.length) {
+                                if (!_this.isShowDialog) {
+                                    if (_this.markersList.length) {
+                                        _this.markersList.forEach(item => {
+                                            item.setMap(null)
+                                        })
+                                        _this.markersList = [];
+                                    };
+                                    _this.dataList = res.recs;
+                                    for(let i = 0;i<_this.dataList.length;i++){
+                                        let longitude = _this.dataList[i].longitude;
+                                        let latitude = _this.dataList[i].latitude;
+
+                                        var center = new TMap.LatLng(latitude, longitude);//设置中心点坐标
+                                        var label = new TMap.MultiLabel({
+                                            id: _this.dataList[i].PoiID,
+                                            map: _this.map, //设置折线图层显示到哪个地图实例中
+                                            //文字标记样式
+                                            styles: {
+                                                'label': new TMap.LabelStyle({
+                                                    'paddingLeft': 5,
+                                                    'height': 20,
+                                                    'width': 50,
+                                                    'size': 12,
+                                                    'color': 'rgb(155,13,20)',
+                                                    'backgroundColor': 'rgba(255,255,255,1)',
+                                                    'borderRadius': 5,
+                                                    'boxShadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                                    'alignment': 'center',
+                                                    
+                                                })
+                                            },
+                                            //文字标记数据
+                                            geometries: [{
+                                                'id': _this.dataList[i].PoiID, //点图形数据的标志信息
+                                                'styleId': 'label', //样式id
+                                                'position': center, //标注点位置
+                                                'content': _this.dataList[i].PoiName, //标注文本
+                                            }]
+                                        });
+
+                                        
+                                        label.on('click', _this.markerClick);
+                                        _this.markersList.push(label);
+                                    }
+                                }
+                            } else {
+                                _this.errorDialog = true;
+                            }
+                        },
+                        error:function(err) {
+                            console.log('请求失败');
+                        }
+                    })
                 },
 
                 //跳转到微信小程序中的详情页面
@@ -773,7 +849,8 @@
 
                 // 点击跳转到校园浏览页面
                 goToTracePage() {
-                    window.location.href = `traceRouter.html?campusId=${this.campusId}&campusName=${this.campusName}`;
+                    window.location.href = `traceSortPage.html?campusId=${this.campusId}&campusName=${this.campusName}`;
+                    // window.location.href = `traceRouter.html?campusId=${this.campusId}&campusName=${this.campusName}`;
                 }
             },
         })

@@ -1,0 +1,111 @@
+html, body {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    float: left;
+    font-family:"微软雅黑";
+}
+.divTitlebar{
+    width: 100%;
+    background-color: #9b0d14;
+    height: 35px;
+    color: #ffffff;
+}
+
+.divTitlebarLeft{
+    width: 5%;
+    float: left;
+    margin-left: 0px;
+    margin-top: 0px;
+    text-align:left;
+}
+
+.divTitlebarLeft img{
+    width: 18px;
+    height: 15px;
+    margin-left: 3px;
+    margin-top: 10px;
+}
+
+.divTitlebarLeft span{
+    display:-moz-inline-box;
+    display:inline-block;
+    text-align:left;
+    margin-top: 4px;
+    font-size: 15px;
+}
+
+.divTitlebarCenter{
+    width: 94%;
+    margin-top: 0px;
+    float: left;
+    text-align: center;
+}
+
+.divTitlebarCenter span{
+    display:-moz-inline-box;
+    display:inline-block;
+    text-align:center;
+    margin-left: -20px;
+    margin-top: 6px;
+    font-size: 16px;
+    color: #ffffff;
+}
+.traceItems {
+    width: 94%;
+    margin-left: 3%;
+    height: 300px;
+}
+.traceItem {
+    padding: 10px 10px 5px 0;
+    height: 90px;
+    border-bottom: 1px solid #6062669e;
+}
+.traceItem:first-child {
+    margin-bottom: 10px;
+ }
+.traceItemLeft {
+    width: 100px;
+    height: 80px;
+    float: left;
+}
+.traceItemLeft img {
+    width: 100%;
+    height: 100%;
+}
+.traceItemRight {
+    float: left;
+    height: 80px;
+    margin-left: 20px;
+}
+.traceItemRight .top {
+    height: 20px;
+    line-height: 20px   ;
+}
+.top span {
+    text-align: center;
+}
+.traceItemRight .center {
+    margin-top: 5px;
+    height: 20px;
+}
+.traceItemRight .bottom {
+    margin-top: 5px;
+    height: 20px;
+}
+.dialog-left-labels {
+    display: flex;
+    font-size: 12px;
+    margin-top: 10px;
+    justify-content: start;
+}
+.dialog-left-label {
+    color: #f58430;
+    background-color: #f5843038;
+    border: 1px solid #f58430;
+    margin-right: 10px;
+    padding: 3px;
+}
+.center .number {
+    margin-right: 10px;
+}

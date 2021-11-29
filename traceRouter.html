@@ -33,7 +33,7 @@
                 <img src="/images/back1.png" @click='goToBackPage'/>
             </div>
             <div class="divTitlebarCenter" >
-                <span>{{pageName}}</span>
+                <span>{{titleName}}</span>
             </div>
         </div>
         <!-- 地图以及手绘地图的贴图 -->
@@ -91,7 +91,29 @@
                     <span>距你{{withDistance}}</span>
                 </div>
                 <div class="des">
-                    <span >{{item.detailDescribe}}</span>
+                    <span >{{item.shortDescribe}}</span>
+                </div>
+            </div>
+            <div class="contentOpt" >
+                <div class="optList">
+                    <div class="optDetail">
+                        <span class="optDetailSpan">
+                            <img class="detailImg" src="./img/3d-detail.png">
+                        </span>
+                        <span @click='goToWxDetail'>详情</span>
+                    </div>
+                    <div class="optAllPic">
+                        <span class="optDetailSpan">
+                            <img class="detailImg" src="./img/shijing.png">
+                        </span>
+                        <span @click='goToWxAllPic'>街景</span>
+                    </div>
+                    <div class="optPath">
+                        <span class="optDetailSpan">
+                            <img class="detailImg" src="./img/go.png">
+                        </span>
+                        <span @click='goToWxPath'>前往</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -103,6 +125,9 @@
             el: '#app',
             data: function () {
                 return { 
+                    titleName: '',
+                    oneDescription: {},
+                    pageName0: '游客的一天',
                     pageName: '山竹姗姗的一天',
                     lngAndLatList: [
                         {
@@ -285,6 +310,128 @@
                                     value: '明德楼A区',
                                     labelImg: './img/zx24.png'
                                 }
+                            ],
+                            studentPath1: [
+                                [36.672, 117.0602], // 校区正门
+                                [36.673259, 117.060173], //大成广场
+                                [36.673835,117.06013], // 图书馆
+                                [36.673921,117.060125],
+                                [36.673921,117.059299],
+                                [36.674201,117.059299], // 蒋维崧雕像
+                                [36.675367,117.059304], // 历史系八大教授群像
+                                [36.67538,117.057888], // 冯沅君陆侃如雕像
+                                [36.67541,117.057464],
+                                [36.675745,117.05747], // 学生公寓3号楼
+                                [36.67621,117.057475], // 学生公寓4号楼
+                                [36.676189,117.057475],
+                                [36.676847,117.057475],
+                                [36.677122,117.057475],
+                                [36.677131,117.05931],
+                                [36.677122,117.060447],
+                                [36.677182,117.061187],
+                                [36.677182,117.062614],
+                                [36.677157,117.062689],
+                                [36.677195,117.062603], // 知新楼C
+                                [36.676636,117.062614], // 13号宿舍楼
+                                [36.676374,117.062614],
+                                [36.675853,117.062614],//留学生公寓
+                                [36.675384,117.062587],
+                                [36.675384,117.061987], //成仿吾雕像
+                                [36.675388,117.06167], // 孔子雕像
+                                [36.675393,117.06094],
+                                [36.674954,117.06094],
+                                [36.674967,117.062201], // 公教楼
+                                [36.674984,117.062598],
+                                [36.674326,117.062603], // 生命科学园
+                                [36.674321,117.062137], //晶体研究所
+                                [36.6743,117.060924],
+                                [36.673448,117.060914], // 明德楼A
+                                [36.673465,117.062582],
+                                [36.672673,117.06255],
+                                [36.672652,117.060683],
+                                [36.672321,117.060662]
+                            ],
+                            studentPointArr1: [
+                                {
+                                    id: '1',
+                                    value: '校区正门',
+                                    labelImg: './img/zx1.png'
+                                },
+                                {
+                                    id: '2',
+                                    value: '图书馆',
+                                    labelImg: './img/zx3.png'
+                                },
+                                {
+                                    id: '3',
+                                    value: '八大教授雕像',
+                                    labelImg: './img/zx5.png'
+                                },
+                                {
+                                    id: '4',
+                                    value: '学生公寓3号楼',
+                                    labelImg: './img/zx7.png'
+                                },
+                                {
+                                    id: '5',
+                                    value: '综合服务楼(食堂)',
+                                    labelImg: './img/zx9.png'
+                                },
+                                {
+                                    id: '6',
+                                    value: '体育场',
+                                    labelImg: './img/zx11.png'
+                                },
+                                {
+                                    id: '7',
+                                    value: '中心校区体育馆',
+                                    labelImg: './img/zx14.png'
+                                },
+                                {
+                                    id: '8',
+                                    value: '知新楼C区',
+                                    labelImg: './img/zx16.png'
+                                },
+                                {
+                                    id: '9',
+                                    value: '学生公寓13号楼',
+                                    labelImg: './img/zx17.png'
+                                },
+                                {
+                                    id: '10',
+                                    value: '留学生公寓',
+                                    labelImg: './img/zx18.png'
+                                },
+                                {
+                                    id: '11',
+                                    value: '孔子雕像',
+                                    labelImg: './img/zx19.png'
+                                },
+                                {
+                                    id: '12',
+                                    value: '成仿吾雕像',
+                                    labelImg: './img/zx20.png'
+                                },
+                                {
+                                    id: '13',
+                                    value: '公教楼',
+                                    labelImg: './img/zx21.png'
+                                },
+                                {
+                                    id: '14',
+                                    value: '生命科学院',
+                                    labelImg: './img/zx22.png'
+                                },
+                                {
+                                    id: '15',
+                                    value: '晶体材料研究所',
+                                    labelImg: './img/zx23.png'
+                                },
+                                {
+                                    id: '16',
+                                    value: '明德楼A区',
+                                    labelImg: './img/zx24.png'
+                                }
                             ]
                         },
                         {
@@ -341,6 +488,7 @@
                     latitude: '',
                     campusPicture: '',
                     latLngArray: [],
+                    latLngArrayStudent: [],
                     selectedPointArray: [],
                     dataList: [],
                     isShowDialog: true,
@@ -367,13 +515,15 @@
                         {
                             id: 1,
                             timer: ''
-                        }
-                    ]
+                        },
+                    ],
+                    index: null,
+
                 }
             },
             created() {
                 this.getSearchVal(); // 得到url中的参数
-                
+                this.transformRem();
             },
             mounted() {
                 var center = new TMap.LatLng(this.latitude, this.longitude);
@@ -402,7 +552,7 @@
             methods: {
                 // 返回上一页面
                 goToBackPage() {
-                    window.location.href=`ttt.html?campusId=${this.campusId}&campusName=${this.campusName}`;
+                    window.location.href=`traceSortPage.html?campusId=${this.campusId}&campusName=${this.campusName}`;
                 },
                 getSearchVal() {
                     var url = decodeURI(location.search); //获取url中"?"符后的字串
@@ -420,6 +570,7 @@
                     }
                     this.campusId = theRequest.campusId;
                     this.campusName = theRequest.campusName;
+                    this.index = theRequest.index;
                     this.getLogAndLat();
                 },
                 getLogAndLat() {
@@ -427,9 +578,17 @@
                         if(item.id == this.campusId) {
                             this.longitude = item.longitude;
                             this.latitude = item.latitude;
-                            this.selectedPointArray = item.studentPointArr;
                             this.campusPicture = item.markerImg;
-                            this.latLngArray = item.studentPath;
+                            if (this.index == 0) {
+                                this.latLngArray = item.studentPath;
+                                this.selectedPointArray = item.studentPointArr;
+                                this.titleName = this.pageName0;
+                            } else {
+                                this.latLngArray = item.studentPath1;
+                                this.selectedPointArray = item.studentPointArr1;
+                                this.titleName = this.pageName;
+                            }
+                            
                         }
                     });
                     // 两点之间的路径距离
@@ -441,7 +600,10 @@
                         this.getPointDetailLocation(item.value); // 得到位置点的具体信息
                     })
                 },
-
+                transformRem() {
+                    var winW = document.documentElement.clientWidth || document.body.clientWidth;
+                    document.documentElement.style.fontSize =  (winW *20)/750 + "px"; // 1rem = 10px
+                },
                 // 画出路径规划
                 drawPioly() {
                     var polylineLayer = new TMap.MultiPolyline({
@@ -466,6 +628,34 @@
                     });
                 },
                 
+                //跳转到微信小程序中的详情页面
+                goToWxDetail(){
+                    wx.miniProgram.navigateTo({
+                        url: '/pages/outDetail/outDetail?current='+JSON.stringify(this.oneDescription)
+                    });
+                },
+
+                // 跳转到微信小程序中的全景页面
+                goToWxAllPic() {
+                    let poiName = this.oneDescription.PoiName;
+                    let poiID = this.oneDescription.PoiID;
+                    let lat = this.oneDescription.latitude;
+                    let lng = this.oneDescription.longitude;
+                    let campusName = this.oneDescription.campusName;
+                    window.location.href=`treePicture.html?campusName=${campusName}&poiID=${poiID}&poiName=${poiName}&lat=${lat}&lng=${lng}&campusId=${this.campusId}`;
+                },
+                 
+                // 跳转到微信小程序的路径规划页面中
+                goToWxPath() {
+                    let endPoint = this.oneDescription.PoiName;
+                    let lat = this.oneDescription.latitude;
+                    let lng = this.oneDescription.longitude;
+                    wx.miniProgram.navigateTo({
+                        url: `/pages/planRouter/planRouter?endPoint=${endPoint}&lat=${lat}&lng=${lng}`
+                    });
+                },
+
+
                 // 得到位置点的具体信息
                 getPointDetailLocation(val) {
                     let _this = this;
@@ -550,6 +740,8 @@
                 goToStart() {
                     this.isShowDialog = false;
                     let index = this.selectedIndex;
+                    this.oneDescription = this.allDataArr[this.selectedIndex];
+                    console.log(this.oneDescription);
                     let id = this.allDataArr[this.selectedIndex].PoiID;;
                     let lat = this.allDataArr[this.selectedIndex].latitude;
                     let lng = this.allDataArr[this.selectedIndex].longitude;
@@ -565,6 +757,7 @@
                     var geolocation = new qq.maps.Geolocation("BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF", "myapp");  // xx-xx-xx-xx为开发密钥，腾讯位置服务申请 http://lbs.qq.com/guides/startup.html
                     if (geolocation) {
                         geolocation.getLocation((position) => {
+                            console.log(position);
                             let lat1 = position.lat;
                             let lng1 = position.lng;
                             let startPoi = new TMap.LatLng(lat1, lng1);
@@ -621,6 +814,7 @@
                         this.marker.setMap(null);
                         this.marker = null;
                     }
+                    this.oneDescription = this.allDataArr[this.selectedIndex];
                     let lat = this.allDataArr[this.selectedIndex].latitude;
                     let lng = this.allDataArr[this.selectedIndex].longitude;
 
