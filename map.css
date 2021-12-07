@@ -244,10 +244,36 @@ input:focus {
     /* background-color: aquamarine; */
     position: absolute;
     z-index: 1000;
-    top: 150px;
+    top: 230px;
     right: 0px;
 }
 .trace-img img {
+    height: 100%;
+    width: 100%;
+}
+.school-img {
+    width: 70px;
+    height: 70px;
+    /* background-color: aquamarine; */
+    position: absolute;
+    z-index: 1000;
+    top: 150px;
+    right: 0px;
+}
+.school-img img {
+    height: 100%;
+    width: 100%;
+}
+.shouCang-img {
+    width: 70px;
+    height: 70px;
+    /* background-color: aquamarine; */
+    position: absolute;
+    z-index: 1000;
+    top: 310px;
+    right: 0px;
+}
+.shouCang-img img {
     height: 100%;
     width: 100%;
 }
