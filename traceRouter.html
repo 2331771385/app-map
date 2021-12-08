@@ -88,7 +88,7 @@
                     <span class="title-content">{{item.PoiName}}</span>
                 </div>
                 <div class="distance">
-                    <span>距你{{withDistance}}</span>
+                    <span>距您{{withDistance}}</span>
                 </div>
                 <div class="des">
                     <span >{{item.shortDescribe}}</span>
@@ -2326,11 +2326,12 @@
                             let endPoi = new TMap.LatLng(lat, lng);
                             let path = [startPoi, endPoi];
                             var dis = TMap.geometry.computeDistance(path);
-                            if (dis < 1000) {
-                                this.withDistance = dis.toFixed(0) + '米';
-                            } else {
-                                this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里"
-                            }
+                            this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里";
+                            // if (dis < 1000) {
+                            //     this.withDistance = dis.toFixed(0) + '米';
+                            // } else {
+                            //     this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里"
+                            // }
                         }, this.error);
                     } else {
                         console.log('不支持');
@@ -2398,11 +2399,12 @@
                             let endPoi = new TMap.LatLng(lat, lng);
                             let path = [startPoi, endPoi];
                             var dis = TMap.geometry.computeDistance(path);
-                            if (dis < 1000) {
-                                this.withDistance = dis.toFixed(0) + '米';
-                            } else {
-                                this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里"
-                            }
+                            this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里";
+                            // if (dis < 1000) {
+                            //     this.withDistance = dis.toFixed(0) + '米';
+                            // } else {
+                            //     this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里"
+                            // }
                         }, this.error);
                     } else {
                         console.log('不支持');
