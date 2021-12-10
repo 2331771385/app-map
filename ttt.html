@@ -853,13 +853,11 @@
 
                 // 跳转到微信小程序中的全景页面
                 goToWxAllPic() {
-                    console.log(this.oneDescription);
                     let poiName = this.oneDescription.PoiName;
                     let poiID = this.oneDescription.PoiID;
                     let lat = this.oneDescription.latitude;
                     let lng = this.oneDescription.longitude;
-                    let campusName = this.oneDescription.campusName;
-                    window.location.href=`treePicture.html?campusName=${campusName}&poiID=${poiID}&poiName=${poiName}&lat=${lat}&lng=${lng}&campusId=${this.campusId}`;
+                    window.location.href=`treePicture.html?campusName=${this.campusName}&poiID=${poiID}&poiName=${poiName}&lat=${lat}&lng=${lng}&campusId=${this.campusId}`;
                 },
                  
                 // 跳转到微信小程序的路径规划页面中
@@ -882,7 +880,6 @@
                 // 点击跳转到校园浏览页面
                 goToTracePage() {
                     window.location.href = `traceSortPage.html?campusId=${this.campusId}&campusName=${this.campusName}`;
-                    // window.location.href = `traceRouter.html?campusId=${this.campusId}&campusName=${this.campusName}`;
                 },
 
                 goToSchoolPage() {
@@ -891,9 +888,8 @@
 
                 // 跳转到收藏列表
                 goToShouCangPage() {
-                    console.log('-----');
                     wx.miniProgram.navigateTo({
-                        url: '/pages/collection/collection'
+                        url: `/pages/collection/collection?campusId=${this.campusId}&campusName=${this.campusName}`
                     });
                 },
             },
