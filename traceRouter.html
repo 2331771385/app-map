@@ -90,7 +90,7 @@
                 <div class="distance">
                     <span>距您{{withDistance}}</span>
                 </div>
-                <div class="des">
+                <div class="des" @click='goToWxDetail'>
                     <span >{{item.shortDescribe}}</span>
                 </div>
             </div>
@@ -800,7 +800,7 @@
                                 {
                                     id: '2',
                                     value: '逸夫法学教学楼',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/hjlb2.png'
                                 },
                                 {
                                     id: '3',
@@ -845,7 +845,7 @@
                                 {
                                     id: '11',
                                     value: '外国语学院楼',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/hjlb11.png'
                                 },
                                 {
                                     id: '12',
@@ -1032,7 +1032,7 @@
                                 {
                                     id: '2',
                                     value: '校训石碑',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/qfsb2.png'
                                 },  
                                 {
                                     id: '3',
@@ -1057,7 +1057,7 @@
                                 {
                                     id: '7',
                                     value: '教学5楼',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/qfsb7.png'
                                 },  
                                 {
                                     id: '8',
@@ -1301,12 +1301,12 @@
                                 {
                                     id: '8',
                                     value: '兴隆山体育场',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/xlsb8.png'
                                 },
                                 {
                                     id: '9',
                                     value: '体育馆',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/xlsb9.png'
                                 },
                                 {
                                     id: '10',
@@ -1535,7 +1535,7 @@
                                 {
                                     id: '3',
                                     value: '教学三楼(伯根楼)',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/btqb3.png'
                                 },
                                 {
                                     id: '4',
@@ -1580,7 +1580,7 @@
                                 {
                                     id: '12',
                                     value: '教学六楼',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/btqb12.png'
                                 },
                                 {
                                     id: '13',
@@ -1991,12 +1991,12 @@
                                 {
                                     id: '4',
                                     value: '学9号楼',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/whb4.png'
                                 },
                                 {
                                     id: '5',
                                     value: '雀园餐厅',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/whb5.png'
                                 },
                                 {
                                     id: '6',
@@ -2011,7 +2011,7 @@
                                 {
                                     id: '8',
                                     value: '文学楼',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/whb8.png'
                                 },
                                 {
                                     id: '9',
@@ -2031,7 +2031,7 @@
                                 {
                                     id: '12',
                                     value: '知行楼',
-                                    labelImg: './img/zx1.png'
+                                    labelImg: './img/whb12.png'
                                 },
                             ]
                         }
@@ -2060,7 +2060,7 @@
                             label: '打卡胜地'
                         }
                     ],
-                    timer: '2小时',
+                    timer: '',
                     distance: '',
                     allDataArr: [], // 需要展示的所有按序号排列的数据，
                     selectedIndex: 0,
@@ -2068,8 +2068,108 @@
                     timerArr: [
                         {
                             id: 1,
-                            timer: ''
+                            timer: [
+                                {
+                                    index: 0,
+                                    value: '2.5小时'
+                                },
+                                {
+                                    index: 1,
+                                    value: '2小时'
+                                }
+                            ]
                         },
+                        {
+                            id: 2,
+                            timer: [
+                                {
+                                    index: 0,
+                                    value: '2小时'
+                                },
+                                {
+                                    index: 1,
+                                    value: '1.5小时'
+                                }
+                            ]
+                        },
+                        {
+                            id: 3,
+                            timer: [
+                                {
+                                    index: 0,
+                                    value: '2小时'
+                                },
+                                {
+                                    index: 1,
+                                    value: '1.5小时'
+                                }
+                            ]
+                        },
+                        {
+                            id: 4,
+                            timer: [
+                                {
+                                    index: 0,
+                                    value: '2.5小时'
+                                },
+                                {
+                                    index: 1,
+                                    value: '2小时'
+                                }
+                            ]
+                        },
+                        {
+                            id: 5,
+                            timer: [
+                                {
+                                    index: 0,
+                                    value: '2.5小时'
+                                },
+                                {
+                                    index: 1,
+                                    value: '2小时'
+                                }
+                            ]
+                        },
+                        {
+                            id: 6,
+                            timer: [
+                                {
+                                    index: 0,
+                                    value: '1小时'
+                                },
+                                {
+                                    index: 1,
+                                    value: '1小时'
+                                }
+                            ]
+                        },
+                        {
+                            id: 7,
+                            timer: [
+                                {
+                                    index: 0,
+                                    value: '3小时'
+                                },
+                                {
+                                    index: 1,
+                                    value: '2小时'
+                                }
+                            ]
+                        },
+                        {
+                            id: 8,
+                            timer: [
+                                {
+                                    index: 0,
+                                    value: '2小时'
+                                },
+                                {
+                                    index: 1,
+                                    value: '2小时'
+                                }
+                            ]
+                        }
                     ],
                     index: null,
                     leftButton: [],
@@ -2151,7 +2251,17 @@
                                 this.selectedPointArray = item.studentPointArr1;
                                 this.titleName = this.pageName;
                             }
-                            
+                            for(let i = 0; i < this.timerArr.length; i++) {
+                                if (this.timerArr[i].id == this.campusId) {
+                                    for(let j = 0; j < this.timerArr[i].timer.length; j++) {
+                                        if (this.timerArr[i].timer[j].index == this.index) {
+                                            this.timer = this.timerArr[i].timer[j].value;
+                                            break;
+                                        }
+                                    }
+                                }
+                            };
+                            console.log(this.timer);
                         }
                     });
                     // 两点之间的路径距离
