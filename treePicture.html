@@ -107,7 +107,8 @@
                 lat: null, // 当前位置点的经纬度
                 lng: null,
                 campusId: '',
-                campusName: ''
+                campusName: '',
+                school: ''
             }
         },
         created() {
@@ -119,7 +120,11 @@
         methods: {
             //跳转到上一页
             goToBackPage() {
-                window.location.href = `ttt.html?campusId=${this.campusId}&campusName=${this.campusName}`;
+                if (this.school != null) {
+                    window.location.href = `goSchool.html?campusId=${this.campusId}&keyWord=报到`;
+                } else {
+                    window.location.href = `ttt.html?campusId=${this.campusId}&campusName=${this.campusName}`;
+                }
             },
             // 获得url中的参数
             getUrlParams() {
@@ -142,14 +147,13 @@
                 this.lng = Number(theRequest.lng);
                 this.campusId = theRequest.campusId;
                 this.campusName = theRequest.campusName;
+                if (theRequest.school) {
+                    this.school = theRequest.school;
+                }
             },
 
             getBDMap() {
-                // this.panorama = new BMap.Panorama('panorama', {
-                //     albumsControl: true
-                // }); 
                 this.panorama = new BMap.Panorama('panorama'); 
-
                 let x_pi = 3.14159265358979324 * 3000.0 / 180.0;
                 let x = this.lng;
                 let y = this.lat;

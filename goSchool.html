@@ -335,8 +335,12 @@
                         }
                     })
                 },
+                
+                // 返回到上一页面中
                 goToBackPage() {
-
+                    wx.miniProgram.navigateTo({
+                        url: `/pages/schoolPoint/schoolPoint?campusId=${this.campusId}`
+                    });
                 },
                 // 点击地图上的某一点，就出现类似于弹框的样式
                 markerClick(e) {
@@ -370,7 +374,8 @@
                     let poiID = this.oneDescription.PoiID;
                     let lat = this.oneDescription.latitude;
                     let lng = this.oneDescription.longitude;
-                    window.location.href=`treePicture.html?campusName=${this.campusName}&poiID=${poiID}&poiName=${poiName}&lat=${lat}&lng=${lng}&campusId=${this.campusId}`;
+                    let school = 1;
+                    window.location.href=`treePicture.html?campusName=${this.campusName}&poiID=${poiID}&poiName=${poiName}&lat=${lat}&lng=${lng}&campusId=${this.campusId}&school=${school}`;
                 },
                  
                 // 跳转到微信小程序的路径规划页面中
@@ -383,7 +388,6 @@
                     });
                 },
                 showInfoClick(e) {
-                    console.log('==========');
                     if (this.isShowDialog) {
                         this.isShowDialog = false;
                     }
