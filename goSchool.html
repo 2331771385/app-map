@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查看报到地点</title>
+    <link rel="stylesheet" href="./goSchool.css" />
+
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- 引入 http-vue-loader -->
+    <script src="https://unpkg.com/http-vue-loader"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <!-- 引入高德地图 -->
+    
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=fc80ab32a75113402df0a426957c25e3&plugin=Map3D,AMap.DistrictLayer,AMap.Scale,AMap.ToolBar,AMap.Transfer,AMap.Geolocation,AMap.plugin,AMap.Pixel"></script>
+    <script src="http://cdn.suoluomei.com/common/js2.0/axios/axios.min.js"></script>
+
+    <!-- 引入腾讯api -->
+    <script src="https://map.qq.com/api/js?v=2.exp&key=BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF"></script>
+    <script src="https://map.qq.com/api/gljs?v=1.exp&key=BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF"></script>
+
+
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <script src="https://webapi.amap.com/ui/1.1/main.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="title">
+            <div class="titleIcon" @click='goToBackPage'>
+                <img :src="backImg">
+            </div>
+            <div class="titleContent">开学季-报到地点</div>
+        </div>
+        <!-- 地图以及手绘地图的贴图 -->
+        <div id="mapContaimer"></div>
+
+        <!-- 页面底部的位置弹框 -->
+        <div id="Dialog" v-if="isShowDialog">
+            <div class="contentTitle">
+                <div class="localtionTitle">{{localtionTitle}}</div>
+                <!-- <div class="localtionDis">距你{{localtionDis}}</div> -->
+            </div>
+            <div class="contentDes" @click="goToWxDetail">
+                <div class="localtionContent">
+                    <span class="localtionContentText">{{localtionDes}}</span>
+                </div>
+            </div>
+            <div class="contentOpt" >
+                <div class="optList">
+                    <div class="optDetail">
+                        <span class="optDetailSpan">
+                            <img class="detailImg" src="./img/3d-detail.png">
+                        </span>
+                        <span @click='goToWxDetail'>详情</span>
+                    </div>
+                    <div class="optAllPic">
+                        <span class="optDetailSpan">
+                            <img class="detailImg" src="./img/shijing.png">
+                        </span>
+                        <span @click='goToWxAllPic'>街景</span>
+                    </div>
+                    <div class="optPath">
+                        <span class="optDetailSpan">
+                            <img class="detailImg" src="./img/go.png">
+                        </span>
+                        <span @click='goToWxPath'>前往</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <el-dialog
+            :visible.sync="errorDialog"
+            width="80%"
+            title="无此类数据！"
+        >
+        </el-dialog>
+    </div>
+
+    <script>
+        Vue.use(httpVueLoader);
+
+        new Vue({
+            el: '#app',
+            data: function () {
+                return { 
+                    oneDescription: {},
+                    isShowDialog: false,
+                    errorDialog: false,
+                    backImg: './img/left.png',
+                    keyWord: '',
+                    campusName: '',
+                    campusId: 0,
+                    longitude: 0,
+                    latitude: 0,
+                    token: '',
+                    leftButton: [],
+                    rightTop: [],
+                    level: 13,
+                    campusPicture: '',
+                    markersList: [],
+                    dataList: [],
+                    localtionTitle: '', //当前点击点的位置信息
+                    localtionDis: '', //当前位置距位置点的距离
+                    localtionDes: '',//当前位置点的简介
+                    lngAndLatList: [
+                        {
+                            id: 1,
+                            longitude: 117.060109, // 经度
+                            latitude: 36.675668,
+                            level: 16,
+                            markerImg: './img/3d-zhongxin3.png',
+                            leftButton: [36.671882, 117.055539],
+                            rightTop: [36.68114, 117.064508]
+                        },
+                        {
+                            id: 6,
+                            longitude: 117.1402000,
+                            latitude: 36.6670740,
+                            level: 16,
+                            markerImg: './img/3d-software.png',
+                            leftButton: [36.66381918828988,117.13619519803706],
+                            rightTop: [36.671081629165755,117.14475738946805],
+                        },
+                        {
+                            id: 2,
+                            longitude: 117.068195,
+                            latitude: 36.687395,
+                            level: 16,
+                            markerImg: './img/3d-hongjialou1.png',
+                            leftButton: [36.684584,117.064832],
+                            rightTop: [36.690546,117.072245]
+                        },
+                        {
+                            id: 3,
+                            longitude: 117.028551,
+                            latitude: 36.651162,
+                            level: 16,
+                            leftButton: [ 36.64465104904049,117.02414986356575],
+                            rightTop: [36.65549825148844,117.03300446200171],
+                            markerImg: './img/3d-qianfoshan3.png'
+                        },
+                        {
+                            id: 5,
+                            longitude: 117.050303,
+                            latitude: 36.601063,
+                            level: 16,
+                            leftButton: [36.594999, 117.045561],
+                            rightTop: [36.606679, 117.059444],
+                            markerImg: './img/3d-xinglongshan.png'
+                        },
+                        {
+                            id: 4,
+                            longitude: 117.018274,
+                            latitude: 36.652161,
+                            level: 16,
+                            markerImg: './img/3d-baotuquan.png',
+                            leftButton: [36.64884,117.014293],
+                            rightTop: [36.655364,117.022919]
+                        },
+                        {
+                            id: 9,
+                            longitude: 117.454672,
+                            latitude: 36.685585
+                        },
+                        {
+                            id: 8,
+                            longitude: 120.688292,
+                            latitude: 36.365274,
+                            level: 15,
+                            markerImg: './img/3d-qingdao3.png',
+                            leftButton: [36.35474323944951,120.67872220476056],
+                            rightTop: [36.37860127524893,120.69462654733957]
+                        },
+                        {
+                            id: 7,
+                            longitude: 122.058225,
+                            latitude: 37.532313,
+                            level: 15,
+                            markerImg: './img/3d-weihai5.png',
+                            leftButton: [37.525433980199104,122.05126545021949],
+                            rightTop: [37.540273,122.066018]
+                        }
+                    ],
+                }
+            },
+            created() {
+                // 获得token
+                this.getToken();
+                this.transformRem();
+                this.getSearchVal();
+            },
+            mounted() {
+                let _this = this;
+                var center = new TMap.LatLng(this.latitude, this.longitude);
+                this.map = new TMap.Map('mapContaimer', {
+                    zoom: _this.level, //设置地图缩放级别
+                    center: center, //设置地图中心点坐标
+                    viewMode: '2D',
+                    baseMap: {			//底图设置（参数为：VectorBaseMap对象）
+                        type: 'vector',	//类型：失量底图
+                        features: ['base', 'building2d']  
+                    }
+                });
+                
+                var imageSW = new TMap.LatLng(this.leftButton[0], this.leftButton[1]);
+                var imageNE = new TMap.LatLng(this.rightTop[0], this.rightTop[1]);
+                var imageLatLngBounds = new TMap.LatLngBounds(imageSW, imageNE); // 根据拟覆盖范围的西南角与东北角新建LatLngBounds对象
+                var imageGroundLayer = new TMap.ImageGroundLayer({
+                    bounds: imageLatLngBounds,
+                    src: this.campusPicture, //拟覆盖图片的URL
+                    map: this.map,
+                    opacity: 1
+                });
+                this.map.removeControl(TMap.constants.DEFAULT_CONTROL_ID.ZOOM);
+              this.map.on('click', this.showInfoClick)
+            },
+            methods: {
+                //获得页面中的token
+                getToken(){
+                    $.ajax({
+                        url: '/campus/m_generateToken',
+                        type: 'post',
+                        dataType: 'json',
+                        success:function(data){
+                            localStorage.setItem('token', data.msg);
+                        },
+                        error:function(err){
+                            console.log(err);
+                        }
+                    })
+                },
+                transformRem() {
+                    var winW = document.documentElement.clientWidth || document.body.clientWidth;
+                    document.documentElement.style.fontSize =  (winW *20)/750 + "px"; // 1rem = 10px
+                },
+                getSearchVal() {
+                    var url = decodeURI(location.search); //获取url中"?"符后的字串
+                    var theRequest = new Object();
+                    if (url.indexOf('?') != -1) {
+                        url = url.substr(1);
+                    }
+                    if (url) {
+                        var strs = url.split('&');
+                        for (var i = 0; i < strs.length; i++) {
+                            var srtArry = strs[i].split('=');
+                            var y = srtArry.shift();
+                            theRequest[y] = unescape(srtArry.join('='));
+                        }
+                    }
+                    this.campusId = theRequest.campusId;
+                    this.keyWord = theRequest.keyWord;
+                    // this.campusName = theRequest.campusName;
+                    this.getLogAndLat();
+                },
+                getLogAndLat() {
+                    this.lngAndLatList.forEach(item => {
+                        if(item.id == this.campusId) {
+                            this.level = item.level;
+                            this.longitude = item.longitude;
+                            this.latitude = item.latitude;
+                            this.campusPicture = item.markerImg;
+                            this.leftButton = item.leftButton;
+                            this.rightTop = item.rightTop;
+                            this.getKeyWordSchool();
+                        }
+                    });
+                },
+                getKeyWordSchool() {
+                    if (this.markersList.length) {
+                        this.markersList.forEach(item => {
+                            item.setMap(null)
+                        });
+                        this.markersList = [];
+                    }
+                    let _this = this;
+                    let token = localStorage.getItem('token');
+                    $.ajax({
+                        url: '/poi/getCampusPoiList',
+                        type: 'get',
+                        dataType: 'json',
+                        data: {
+                            token: token,
+                            ID: this.campusId,
+                            keyWord: this.keyWord
+                        },
+                        success:function(res) {
+                            if (res.recs.length) {
+                                _this.dataList = res.recs;
+                                for(let i = 0;i<_this.dataList.length;i++){
+                                    let longitude = _this.dataList[i].longitude;
+                                    let latitude = _this.dataList[i].latitude;
+
+
+                                    var center = new TMap.LatLng(latitude, longitude);//设置中心点坐标
+                                    var label = new TMap.MultiLabel({
+                                        id: _this.dataList[i].PoiID,
+                                        map: _this.map, //设置折线图层显示到哪个地图实例中
+                                        //文字标记样式
+                                        styles: {
+                                            'label': new TMap.LabelStyle({
+                                                'paddingLeft': 5,
+                                                'height': 20,
+                                                'width': 90,
+                                                'size': 12,
+                                                'color': 'rgb(155,13,20)',
+                                                'backgroundColor': 'rgba(255,255,255,1)',
+                                                'borderRadius': 5,
+                                                'boxShadow': '0 2px 6px 0 rgba(114, 124, 245, 0.5)',
+                                                'alignment': 'center',
+                                                
+                                            })
+                                        },
+                                        //文字标记数据
+                                        geometries: [{
+                                            'id': _this.dataList[i].PoiID, //点图形数据的标志信息
+                                            'styleId': 'label', //样式id
+                                            'position': center, //标注点位置
+                                            'content': _this.dataList[i].PoiName, //标注文本
+                                        }]
+                                    });
+
+                                    label.on('click', _this.markerClick);
+                                     _this.markersList.push(label);
+                                }
+                            } else {
+                                _this.errorDialog = true;
+                            }
+                        },
+                        error:function(err) {
+                            console.log('请求失败');
+                        }
+                    })
+                },
+                goToBackPage() {
+
+                },
+                // 点击地图上的某一点，就出现类似于弹框的样式
+                markerClick(e) {
+                    for(let i = 0;i < this.dataList.length;i++){
+                        if (this.dataList[i].PoiID == e.target.id) {
+                            this.oneDescription = this.dataList[i];
+                            this.localtionTitle = this.dataList[i].PoiName;
+                            this.showLocationMsg(this.dataList[i]);
+                            break;
+                        }
+                    }
+                }, 
+                
+                //展示当前点击的位置点的信息
+                showLocationMsg(data){
+                    let center = new TMap.LatLng(data.latitude, data.longitude);
+                    this.map.setCenter(center);
+                    this.isShowDialog = true;
+                    this.localtionDes = data.shortDescribe;
+                },
+                //跳转到微信小程序中的详情页面
+                goToWxDetail(){
+                    wx.miniProgram.navigateTo({
+                        url: '/pages/outDetail/outDetail?current='+JSON.stringify(this.oneDescription)
+                    });
+                },
+
+                // 跳转到微信小程序中的全景页面
+                goToWxAllPic() {
+                    let poiName = this.oneDescription.PoiName;
+                    let poiID = this.oneDescription.PoiID;
+                    let lat = this.oneDescription.latitude;
+                    let lng = this.oneDescription.longitude;
+                    window.location.href=`treePicture.html?campusName=${this.campusName}&poiID=${poiID}&poiName=${poiName}&lat=${lat}&lng=${lng}&campusId=${this.campusId}`;
+                },
+                 
+                // 跳转到微信小程序的路径规划页面中
+                goToWxPath() {
+                    let endPoint = this.oneDescription.PoiName;
+                    let lat = this.oneDescription.latitude;
+                    let lng = this.oneDescription.longitude;
+                    wx.miniProgram.navigateTo({
+                        url: `/pages/planRouter/planRouter?endPoint=${endPoint}&lat=${lat}&lng=${lng}`
+                    });
+                },
+                showInfoClick(e) {
+                    console.log('==========');
+                    if (this.isShowDialog) {
+                        this.isShowDialog = false;
+                    }
+                },
+            },
+        })
+    </script>
+</body>
+</html>

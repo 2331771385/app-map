@@ -771,7 +771,6 @@
 
                 // 点击地图上的某一点,当点击的点不是地图上定义的标签的时候，就将弹框关闭
                 showInfoClick(e) {
-                    console.log(e);
                     if (this.isShowDialog) {
                         this.isShowDialog = false;
                     }
@@ -883,7 +882,9 @@
                 },
 
                 goToSchoolPage() {
-
+                    wx.miniProgram.navigateTo({
+                        url: `/pages/schoolPage/schoolPage?campusId=${this.campusId}&campusName=${this.campusName}`
+                    });
                 },
 
                 // 跳转到收藏列表

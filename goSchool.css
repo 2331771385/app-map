@@ -1,0 +1,138 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+#app {
+    height: 100vh;
+    width: 100%;
+}
+#mapContaimer {
+    height: 92%;
+    width: 100%;
+    /* position: absolute;
+    left: 0;
+    top: 90px; */
+}
+.title {
+    width: 100%;
+    height: 8%;
+}
+.titleIcon {
+    float: left;
+    height: 20px;
+    width: 20px;
+    margin-top: 15px;
+    text-align: center;
+}
+.titleIcon img {
+    height: 100%;
+    width: 100%;
+}
+.titleContent {
+    float: left;
+    width: 80%;
+    text-align: center;
+    margin-top: 15px;
+    /* line-height: 5%; */
+    color: #000;
+    font-size: 1.8rem;
+}
+.rotate-circle {
+    display: none !important;
+}
+.tmap-scale-control {
+    display: none !important;
+}
+.logo-text {
+    display: none !important;
+}
+#Dialog {
+    height: 10rem;
+    width: 92%;
+    background-color: #fff;
+    box-shadow: 2px 2px 6px #909090 ;
+    position: absolute;
+    bottom: 2%;
+    padding: 0.2rem;
+    left: 4%;
+    border-radius: 0.5rem;
+    z-index: 9999;
+}
+.contentTitle {
+    height: 3rem;
+    margin: 0.2rem 0.6rem;
+}
+.contentDes {
+    height: 4rem;
+    margin: 0.4rem 0.6rem 0.2rem;
+    border-bottom: 1px solid #6062669e;
+}
+.localtionTitle {
+   font-size: 1.4rem;
+}
+.contentOpt {
+    height: 2rem;
+    margin: 0.3rem 0.8rem 0.2rem;
+}
+.optList {
+    display: flex;
+    justify-content: space-between;
+}
+.optDetailSpan {
+    height: 1.5rem;
+    width: 1.5rem;
+    display: block;
+    float: left;
+    margin-right: 0.5rem;
+}
+.detailImg {
+    height: 100%;
+    width: 100%;
+}
+.localtionContentText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.el-dialog__body {
+    display: none !important;
+}
+.el-dialog__header {
+    padding: 1rem 2rem !important;
+    margin: 0 !important;
+}
+.el-dialog__headerbtn {
+    top: 1.5rem !important;
+}
+.label-layer {
+    background-color: aqua;
+}
+.content-label-id {
+    height: 2rem;
+    width: 2rem;
+    background-color: aqua;
+}
+.rotate-circle {
+    display: none !important;
+}
+.tmap-scale-control {
+    display: none !important;
+}
+.logo-text {
+    display: none !important;
+}
+.trace-img {
+    width: 70px;
+    height: 70px;
+    /* background-color: aquamarine; */
+    position: absolute;
+    z-index: 1000;
+    top: 230px;
+    right: 0px;
+}
+.trace-img img {
+    height: 100%;
+    width: 100%;
+}
