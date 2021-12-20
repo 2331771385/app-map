@@ -253,7 +253,7 @@
                     }
                     this.campusId = theRequest.campusId;
                     this.keyWord = theRequest.keyWord;
-                    // this.campusName = theRequest.campusName;
+                    this.campusName = theRequest.campusName;
                     this.getLogAndLat();
                 },
                 getLogAndLat() {
@@ -304,7 +304,7 @@
                                             'label': new TMap.LabelStyle({
                                                 'paddingLeft': 5,
                                                 'height': 20,
-                                                'width': 90,
+                                                'width': 100,
                                                 'size': 12,
                                                 'color': 'rgb(155,13,20)',
                                                 'backgroundColor': 'rgba(255,255,255,1)',
@@ -339,7 +339,7 @@
                 // 返回到上一页面中
                 goToBackPage() {
                     wx.miniProgram.navigateTo({
-                        url: `/pages/schoolPoint/schoolPoint?campusId=${this.campusId}`
+                        url: `/pages/schoolPoint/schoolPoint?campusId=${this.campusId}&campusName=${this.campusName}`
                     });
                 },
                 // 点击地图上的某一点，就出现类似于弹框的样式
