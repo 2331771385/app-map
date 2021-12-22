@@ -90,7 +90,7 @@
 
         <!-- 搜索框 -->
         <div class="searchBox">
-            <input class="inputBox" v-model="searchVal" placeholder='请输入查询关键词' />
+            <input class="inputBox" @focus="changeVal" v-model="searchVal" placeholder='请输入查询关键词' />
             <button class="searchBtn" @click="getResultList">查询</button>
         </div>
 
@@ -139,6 +139,7 @@
         <!-- 开学季 -->
         <div class="school-img" @click="goToSchoolPage">
             <img src="./img/entrance_2.png" />
+            <!-- <img src="./img/study1.png" /> -->
         </div>
 
         <!-- 旅游路线 -->
@@ -478,6 +479,9 @@
               this.map.on('click', this.showInfoClick)
             },
             methods: {
+                changeVal() {
+                    this.isShowDialog = false;
+                },
                 //获得页面中的token
                 getToken(){
                     $.ajax({
@@ -606,7 +610,6 @@
                             item.setMap(null)
                         })
                         this.markersList = [];
-                        // this.map.remove(this.markersList);
                     }
                     let _this = this;
                     let token = localStorage.getItem('token');
@@ -630,7 +633,6 @@
                                     }
 
                                     var center = new TMap.LatLng(latitude, longitude);//设置中心点坐标
-                                    console.log(center);
                                     var label = new TMap.MultiLabel({
                                         id: _this.dataList[i].PoiID,
                                         map: _this.map, //设置折线图层显示到哪个地图实例中

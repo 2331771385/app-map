@@ -130,7 +130,8 @@ html, body {
 .dialog-right-text {
     display: flex;
     flex-wrap: wrap;
-    width: 30px;
+    /* width: 30px; */
+    width: 3rem;
     text-align: center;
     padding: 20px 0px 0px 20px;
 }
