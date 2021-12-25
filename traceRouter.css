@@ -79,7 +79,7 @@ html, body {
     width: 98%;
     margin-left: 1%;
     position: absolute;
-    bottom: 1px;
+    bottom: 2%;
     z-index: 9999;
     background-color: #ffffff;
     box-shadow: rgb(39 39 42 / 50%) 0px 2px 6px 0px
@@ -143,7 +143,7 @@ html, body {
     width: 98%;
     margin-left: 1%;
     position: absolute;
-    bottom: 1px;
+    bottom: 2%;
     z-index: 9999;
     background-color: #ffffff;
     box-shadow: rgb(39 39 42 / 50%) 0px 2px 6px 0px
