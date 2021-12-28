@@ -405,7 +405,10 @@
                     markersList: [], //点标记的数组，可能一次会加入很多点
                     leftButton: [],
                     rightTop: [],
-                    level: 13
+                    level: 13,
+                    visiType: 2,
+                    poiId: 0,
+                    poiName: ''
                 }
             },
             created() {
@@ -479,6 +482,30 @@
               this.map.on('click', this.showInfoClick)
             },
             methods: {
+                getStaticData() {
+                    let data = {
+                        visiType: this.visiType,
+                        urlContent: location.pathname,
+                        campusId: this.campusId,
+                        poiId: this.poiId,
+                        campuName: this.campusName,
+                        poiName: this.poiName
+                    }
+                    $.ajax({
+                        url: '/TbVisiLog/save',
+                        type: 'post',
+                        dataType: 'json',
+                        contentType: "application/json;charset=utf-8",
+                        data: JSON.stringify(data),
+                        success: function(res) {
+                            console.log(res);
+                        },
+                        error:function(err) {
+                            console.log('请求失败');
+                        }
+                    })
+                },
+
                 changeVal() {
                     this.isShowDialog = false;
                 },
@@ -514,8 +541,10 @@
                             theRequest[y] = unescape(srtArry.join('='));
                         }
                     }
+                    
                     this.campusId = theRequest.campusId;
                     this.campusName = theRequest.campusName;
+                    this.getStaticData();
                     this.getLogAndLat();
                 },
                 getLogAndLat() {
