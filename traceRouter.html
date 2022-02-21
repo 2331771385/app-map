@@ -7,7 +7,9 @@
     <title>各校区的旅游路线</title>
     <link rel="stylesheet" href="./traceRouter.css" />
     <!-- 先引入 Vue -->
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+    <!-- <script src="https://unpkg.com/vue/dist/vue.js"></script> -->
     <!-- 引入 http-vue-loader -->
     <script src="https://unpkg.com/http-vue-loader"></script>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
@@ -2426,10 +2428,11 @@
                         }
                     };
 
+                    console.log('这是处理距离的函数');
                     var geolocation = new qq.maps.Geolocation("BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF", "myapp");  // xx-xx-xx-xx为开发密钥，腾讯位置服务申请 http://lbs.qq.com/guides/startup.html
+                    console.log(geolocation);
                     if (geolocation) {
                         geolocation.getLocation((position) => {
-                            console.log(position);
                             let lat1 = position.lat;
                             let lng1 = position.lng;
                             let startPoi = new TMap.LatLng(lat1, lng1);
@@ -2510,6 +2513,8 @@
                             let path = [startPoi, endPoi];
                             var dis = TMap.geometry.computeDistance(path);
                             this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里";
+                            console.log('这里是计算距离的方法');
+                            console.log(this.withDistance);
                             // if (dis < 1000) {
                             //     this.withDistance = dis.toFixed(0) + '米';
                             // } else {
@@ -2560,6 +2565,7 @@
                 },
                 
                 error() {
+                    console.log('调用函数发生错误');
                     console.log('失败的回调');
                 },
             },
