@@ -2419,7 +2419,6 @@
                     let id = this.allDataArr[this.selectedIndex].PoiID;;
                     let lat = this.allDataArr[this.selectedIndex].latitude;
                     let lng = this.allDataArr[this.selectedIndex].longitude;
-
                     let labelImg;
                     for(let i = 0; i < this.selectedPointArray.length; i++) {
                         if (this.selectedPointArray[i].id == index + 1) {
@@ -2427,10 +2426,7 @@
                             break;
                         }
                     };
-
-                    console.log('这是处理距离的函数');
                     var geolocation = new qq.maps.Geolocation("BPQBZ-XU3L6-B7RS3-MNX25-UZBV2-WDBVF", "myapp");  // xx-xx-xx-xx为开发密钥，腾讯位置服务申请 http://lbs.qq.com/guides/startup.html
-                    console.log(geolocation);
                     if (geolocation) {
                         geolocation.getLocation((position) => {
                             let lat1 = position.lat;
@@ -2440,16 +2436,10 @@
                             let path = [startPoi, endPoi];
                             var dis = TMap.geometry.computeDistance(path);
                             this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里";
-                            // if (dis < 1000) {
-                            //     this.withDistance = dis.toFixed(0) + '米';
-                            // } else {
-                            //     this.withDistance = (Math.round(dis/100)/10).toFixed(1) + "公里"
-                            // }
                         }, this.error);
                     } else {
                         console.log('不支持');
                     }
-
                     let center = new TMap.LatLng(lat, lng);
                     this.marker = new TMap.MultiMarker({
                         id: `demo${this.selectedIndex}`,

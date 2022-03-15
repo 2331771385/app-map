@@ -139,13 +139,15 @@
 
         <!-- 开学季 -->
         <div class="school-img" @click="goToSchoolPage">
-            <img src="./img/entrance_2.png" />
+            <!-- <img src="./img/entrance_2.png" /> -->
+            <img src="./img/new-school.png" />
             <!-- <img src="./img/study1.png" /> -->
         </div>
 
         <!-- 旅游路线 -->
         <div class="trace-img" @click="goToTracePage">
-            <img src="./img/line_btn.png" />
+            <img src="./img/new-path.png" />
+            <!-- <img src="./img/line_btn.png" /> -->
         </div>
 
         <!-- 收藏夹 -->
@@ -338,6 +340,7 @@
                             longitude: 117.068195,
                             latitude: 36.687395,
                             level: 16,
+                            // markerImg: './img/new-honglou.png',
                             markerImg: './img/3d-hongjialou1.png',
                             leftButton: [36.684584,117.064832],
                             rightTop: [36.690546,117.072245]
@@ -359,6 +362,7 @@
                             leftButton: [36.594999, 117.045561],
                             rightTop: [36.606679, 117.059444],
                             markerImg: './img/3d-xinglongshan.png'
+                            // markerImg: './img/new-xinglongshan.png'
                         },
                         {
                             id: 4,
@@ -388,6 +392,7 @@
                             longitude: 122.058225,
                             latitude: 37.532313,
                             level: 15,
+                            // markerImg: './img/new-weihai.png',
                             markerImg: './img/3d-weihai5.png',
                             leftButton: [37.525433980199104,122.05126545021949],
                             rightTop: [37.540273,122.066018]
@@ -470,8 +475,6 @@
                 
                 var imageSW = new TMap.LatLng(this.leftButton[0], this.leftButton[1]);
                 var imageNE = new TMap.LatLng(this.rightTop[0], this.rightTop[1]);
-                // var imageSW = new TMap.LatLng(36.671882, 117.055539);
-                // var imageNE = new TMap.LatLng(36.68114, 117.064508);
                 var imageLatLngBounds = new TMap.LatLngBounds(imageSW, imageNE); // 根据拟覆盖范围的西南角与东北角新建LatLngBounds对象
                 var imageGroundLayer = new TMap.ImageGroundLayer({
                     bounds: imageLatLngBounds,
@@ -483,30 +486,6 @@
               this.map.on('click', this.showInfoClick)
             },
             methods: {
-                // getStaticData() {
-                //     let data = {
-                //         visiType: this.visiType,
-                //         urlContent: location.pathname,
-                //         campusId: this.campusId,
-                //         poiId: this.poiId,
-                //         campusName: this.campusName,
-                //         poiName: this.poiName
-                //     }
-                //     $.ajax({
-                //         url: '/TbVisiLog/save',
-                //         type: 'post',
-                //         dataType: 'json',
-                //         contentType: "application/json;charset=utf-8",
-                //         data: JSON.stringify(data),
-                //         success: function(res) {
-                //             console.log(res);
-                //         },
-                //         error:function(err) {
-                //             console.log('请求失败');
-                //         }
-                //     })
-                // },
-
                 changeVal() {
                     this.isShowDialog = false;
                 },
@@ -517,6 +496,8 @@
                         type: 'post',
                         dataType: 'json',
                         success:function(data){
+                            console.log('获取token的方法');
+                            console.log(data);
                             localStorage.setItem('token', data.msg);
                         },
                         error:function(err){
@@ -545,7 +526,6 @@
                     
                     this.campusId = theRequest.campusId;
                     this.campusName = theRequest.campusName;
-                    // this.getStaticData();
                     this.getLogAndLat();
                 },
                 getLogAndLat() {
@@ -635,6 +615,7 @@
                 
 
                 getResultData(poiType) {
+                    console.log(poiType);
                     if (this.markersList.length) {
                         this.markersList.forEach(item => {
                             item.setMap(null)
@@ -644,15 +625,25 @@
                     let _this = this;
                     let token = localStorage.getItem('token');
                     $.ajax({
-                        url: '/poi/getCampusPoiList',
+                        // url: '/poi/getCampusPoiList',
+                        // type: 'get',
+                        // dataType: 'json',
+                        // data: {
+                        //     token: token,
+                        //     ID: this.campusId,
+                        //     poiType: poiType
+                        // },
+                        url: '/campuspoi/poi/list',
                         type: 'get',
                         dataType: 'json',
                         data: {
-                            token: token,
-                            ID: this.campusId,
-                            poiType: poiType
+                            // token: token,
+                            campusid: this.campusId,
+                            poisubtype: poiType
                         },
                         success:function(res) {
+                            console.log('------');
+                            console.log(res);
                             if (res.recs.length) {
                                 _this.dataList = res.recs;
                                 for(let i = 0;i<_this.dataList.length;i++){
@@ -709,6 +700,7 @@
 
                 // 得到建筑数据
                 getResultBuildList(poiType){
+                    console.log(poiType);
                     if (poiType == '1' || poiType == '2' || poiType == '5') {
                         this.getResultData(poiType);
                         return;
