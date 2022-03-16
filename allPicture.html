@@ -53,7 +53,6 @@
                     var winW = document.documentElement.clientWidth || document.body.clientWidth;
                     document.documentElement.style.fontSize =  (winW *20)/750 + "px"; // 1rem = 10px
                 },
-                // 获得url中的参数
                 getUrlParams() {
                     var url = decodeURI(location.search); //获取url中"?"符后的字串
                     var theRequest = new Object();
@@ -70,7 +69,6 @@
                     }
                     this.campusId = theRequest.campusId;
                     this.keyWord = theRequest.keyWord;
-                    // 拿到参数之后，联调接口，获得接口中的详细数据
                     this.getLocationData();
                 },
 
@@ -78,18 +76,18 @@
                 getLocationData() {
                     var _this = this;
                     $.ajax({
-                        url: '/poi/getCampusPoiList',
+                        url: 'http://116.62.20.146:8081/campuspoi/poi/list1',
                         type: 'get',
                         dataType: 'json',
                         data: {
-                            token: localStorage.getItem('token'),
-                            ID: this.campusId,
-                            keyWord: this.keyWord
+                            campusid: this.campusId,
+                            pageSize: 10,
+                            pageNum: 1,
+                            poiname: this.keyWord
                         },
                         success:function(res) {
-                            console.log(res.recs);
-                            if (res.recs.length) {
-                                _this.getAllPicture(res.recs[0]);
+                            if (res.rows.length) {
+                                _this.getAllPicture(res.rows[0]);
                             }
                         },
                         error:function(err) {
@@ -99,10 +97,8 @@
                 },
                  //跳转到上一页
                  goToBackPage() {
-                     
                     wx.miniProgram.navigateTo({
                         url: `/pages/out/out?campusId=${this.campusId}&campusName=${this.keyWord}`,
-                        // url: '/pages/index/index'
                     });
                 },
 
@@ -110,9 +106,9 @@
                 getAllPicture(data){
                     this.viewer = new PhotoSphereViewer.Viewer({
                         container: 'viewer',
-                        panorama: data.pic720Url,
-                        defaultLong: data.pic720DefaultLng, //默认水平角度，[0,2π]
-                        defaultLat: data.pic720DefaultLat,//默认垂直角度，[-π/2,π/2]
+                        panorama: data.pic720url,
+                        defaultLong: data.pic720defaultlat, //默认水平角度，[0,2π]
+                        defaultLat: data.pic720defaultlng,//默认垂直角度，[-π/2,π/2]
                         //定制导航栏
                         navbar: [
                             'autorotate',

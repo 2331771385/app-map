@@ -82,18 +82,18 @@
             <div 
                 class="detail-dialog-content" 
                 v-for="(item,index) in allDataArr"
-                :key="item.PoiID"
+                :key="item.poiid"
                 v-if="index == selectedIndex"
             >
                 <div class="title">
                     <span class="title-number">{{index+1}}</span>
-                    <span class="title-content">{{item.PoiName}}</span>
+                    <span class="title-content">{{item.poiname}}</span>
                 </div>
                 <div class="distance">
                     <span>距您{{withDistance}}</span>
                 </div>
                 <div class="des" @click='goToWxDetail'>
-                    <span >{{item.shortDescribe}}</span>
+                    <span >{{item.shortdescribe}}</span>
                 </div>
             </div>
             <div class="contentOpt" >
@@ -2263,7 +2263,6 @@
                                     }
                                 }
                             };
-                            console.log(this.timer);
                         }
                     });
                     // 两点之间的路径距离
@@ -2312,12 +2311,11 @@
 
                 // 跳转到微信小程序中的全景页面
                 goToWxAllPic() {
-                    let poiName = this.oneDescription.PoiName;
-                    let poiID = this.oneDescription.PoiID;
+                    let poiName = this.oneDescription.poiname;
+                    let poiID = this.oneDescription.poiid;
                     let lat = this.oneDescription.latitude;
                     let lng = this.oneDescription.longitude;
-                    let campusName = this.oneDescription.campusName;
-                    window.location.href=`treePicture.html?campusName=${campusName}&poiID=${poiID}&poiName=${poiName}&lat=${lat}&lng=${lng}&campusId=${this.campusId}`;
+                    window.location.href=`treePicture.html?campusName=${this.campusName}&poiID=${poiID}&poiName=${poiName}&lat=${lat}&lng=${lng}&campusId=${this.campusId}`;
                 },
                  
                 // 跳转到微信小程序的路径规划页面中
@@ -2334,23 +2332,23 @@
                 // 得到位置点的具体信息
                 getPointDetailLocation(val) {
                     let _this = this;
-                    let token = localStorage.getItem('token');
                     $.ajax({
-                        url: '/poi/getCampusPoiList',
+                        url: 'http://116.62.20.146:8081/campuspoi/poi/list1',
                         type: 'get',
                         dataType: 'json',
                         data: {
-                            token: token,
-                            ID: this.campusId,
-                            keyWord: val
+                            campusid: this.campusId,
+                            pageSize: 1000,
+                            pageNum: 1,
+                            poiname: val
                         },
                         success:function(res) {
-                            if (res.recs.length == 1) {
-                                _this.dataList.push(res.recs[0])
-                            } else if (res.recs.length > 1) {
-                                for(let i = 0; i < res.recs.length; i++) {
-                                    if (res.recs[i].PoiName == val) {
-                                        _this.dataList.push(res.recs[i]);
+                            if (res.rows.length == 1) {
+                                _this.dataList.push(res.rows[0])
+                            } else if (res.rows.length > 1) {
+                                for(let i = 0; i < res.rows.length; i++) {
+                                    if (res.rows[i].poiname == val) {
+                                        _this.dataList.push(res.rows[i]);
                                         break
                                     }
                                 }
@@ -2372,11 +2370,11 @@
                     let len2 = this.selectedPointArray;
                     for(let j = 0; j < len2.length; j++) {
                         for(let i = 0; i < len1.length; i++) {
-                            if (len2[j].value == len1[i].PoiName) {
+                            if (len2[j].value == len1[i].poiname) {
                                 this.allDataArr.push(len1[i])
                                 let lat = len1[i].latitude;
                                 let lng = len1[i].longitude;
-                                let poiIndex = len1[i].PoiID;
+                                let poiIndex = len1[i].poiid;
                                 let content = len2[j].id;
 
                                 var center = new TMap.LatLng(lat, lng);//设置中心点坐标
@@ -2416,7 +2414,7 @@
                     this.isShowDialog = false;
                     let index = this.selectedIndex;
                     this.oneDescription = this.allDataArr[this.selectedIndex];
-                    let id = this.allDataArr[this.selectedIndex].PoiID;;
+                    let id = this.allDataArr[this.selectedIndex].poiid;;
                     let lat = this.allDataArr[this.selectedIndex].latitude;
                     let lng = this.allDataArr[this.selectedIndex].longitude;
                     let labelImg;

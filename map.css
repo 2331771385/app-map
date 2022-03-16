@@ -127,7 +127,7 @@
     left: 25%;
     width: 50%;
     height: 3rem;
-    z-index: 9999;
+    /* z-index: 9999; */
 }
 .inputBox .el-input {
     background-color: #fff !important;
