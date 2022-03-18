@@ -618,9 +618,9 @@
                 //跳转到微信小程序中的详情页面
                 goToWxDetail(){
                     console.log(this.oneDescription);
-                    // wx.miniProgram.navigateTo({
-                    //     url: '/pages/outDetail/outDetail?current='+JSON.stringify(this.oneDescription)
-                    // });
+                    wx.miniProgram.navigateTo({
+                        url: '/pages/outDetail/outDetail?current='+JSON.stringify(this.oneDescription)
+                    });
                 },
 
                 // 跳转到微信小程序中的全景页面

@@ -15,8 +15,8 @@
     
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
 
-    <script type="text/javascript" src="//api.map.baidu.com/api?type=webgl&&v=1.0&ak=0tZtAhYAGEnsoG98qtZN7bNY"></script>
-    <script type="text/javascript" src="//api.map.baidu.com/api?v=3.0&ak=0tZtAhYAGEnsoG98qtZN7bNY"></script>
+    <script type="text/javascript" src="//api.map.baidu.com/api?type=webgl&&v=1.0&ak=SBmef8NsaMFxBTqkcGN3ZWsGCrELvz1c"></script>
+    <script type="text/javascript" src="//api.map.baidu.com/api?v=3.0&ak=SBmef8NsaMFxBTqkcGN3ZWsGCrELvz1c"></script>
     <style>
         * {
             margin: 0;
@@ -151,6 +151,7 @@
                 if (theRequest.school) {
                     this.school = theRequest.school;
                 }
+                console.log();
             },
 
             getBDMap() {
@@ -162,6 +163,8 @@
                 let theta = Math.atan2(y, x) + 0.000003 * Math.cos(x * x_pi);
                 let lngs = z * Math.cos(theta) + 0.0065;
                 let lats = z * Math.sin(theta) + 0.006;
+                console.log(lngs);
+                console.log(lats);
                 this.panorama.setPosition(new BMap.Point(lngs, lats)); //根据经纬度坐标展示全景图
             },
         }

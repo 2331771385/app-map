@@ -104,11 +104,12 @@
 
                 // 获得当前位置点的全景图
                 getAllPicture(data){
+                    console.log(data);
                     this.viewer = new PhotoSphereViewer.Viewer({
                         container: 'viewer',
-                        panorama: data.pic720url,
-                        defaultLong: data.pic720defaultlat, //默认水平角度，[0,2π]
-                        defaultLat: data.pic720defaultlng,//默认垂直角度，[-π/2,π/2]
+                        panorama: 'http://116.62.20.146:8081'+data.pic720url,
+                        defaultLong: data.pic720defaultlng, //默认水平角度，[0,2π]
+                        defaultLat: data.pic720defaultlat,//默认垂直角度，[-π/2,π/2]
                         //定制导航栏
                         navbar: [
                             'autorotate',
